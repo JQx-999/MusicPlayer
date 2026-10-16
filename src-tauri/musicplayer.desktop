@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=MusicPlayer
+Comment=A music player with radio streaming capabilities.
+Exec=musicplayer %U
+Icon=musicplayer
+Terminal=false
+Categories=AudioVideo;Audio;Player;Music;
+Keywords=Music;Audio;Radio;Player;
+StartupNotify=true
