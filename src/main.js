@@ -1042,7 +1042,6 @@ const mediaInfo = document.querySelector(".media-info");
 let toggle = 0;
 sidebarToggle.addEventListener("click", function () {
   if (toggle == 0) {
-    console.log("nigga");
     sideLabel.forEach(element => {
       element.style.setProperty('display', 'none');
     });
