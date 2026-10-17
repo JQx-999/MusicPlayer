@@ -723,10 +723,6 @@ homeBtn?.addEventListener("click", () => {
 
   homeSec.style.setProperty("display", "block");
 
-  sideBtn?.style.setProperty(
-    "background",
-    "rgba(255, 255, 255, 0.02)"
-  );
 
   collectionsBtnQuery.style.setProperty(
     "background",
@@ -756,10 +752,6 @@ searchBtn?.addEventListener("click", () => {
 
   searchSec.style.setProperty("display", "block");
 
-  sideBtn?.style.setProperty(
-    "background",
-    "rgba(255, 255, 255, 0.02)"
-  );
 
   homeBtnQuery.style.setProperty(
     "background",
@@ -789,10 +781,6 @@ collectionsBtn?.addEventListener("click", () => {
 
   collectionsSec.style.setProperty("display", "block");
 
-  sideBtn?.style.setProperty(
-    "background",
-    "rgba(255, 255, 255, 0.02)"
-  );
 
   homeBtnQuery.style.setProperty(
     "background",
@@ -822,10 +810,6 @@ streamBtn?.addEventListener("click", () => {
 
   streamSec.style.setProperty("display", "block");
 
-  sideBtn?.style.setProperty(
-    "background",
-    "rgba(255, 255, 255, 0.02)"
-  );
 
   homeBtnQuery.style.setProperty(
     "background",
@@ -1039,5 +1023,51 @@ document.addEventListener("click", event => {
   if (event.target.closest("#radio-stop-btn")) {
     event.preventDefault();
     stopRadio();
+  }
+});
+
+// --------------------------------------------------
+// SIDEBAR TOGGLE SWITCH
+// --------------------------------------------------
+
+const sidebarToggle = document.getElementById("sidebar-toggle");
+const sidebarToggleSelect = document.querySelector("#sidebar-toggle");
+const sideLabel = document.querySelectorAll(".label");
+const sidePanel = document.querySelector(".side-panel");
+const sideBtnSelect = document.querySelectorAll(".btn");
+const mainContent = document.querySelector(".main-content");
+const bottomPlayer = document.querySelector(".player");
+const mediaInfo = document.querySelector(".media-info");
+
+let toggle = 0;
+sidebarToggle.addEventListener("click", function () {
+  if (toggle == 0) {
+    console.log("nigga");
+    sideLabel.forEach(element => {
+      element.style.setProperty('display', 'none');
+    });
+    sidePanel.style.setProperty('width', '70px', 'important');
+    sidebarToggleSelect.style.setProperty('background-color', 'rgba(0, 0, 0, 0.1)', 'important');
+    sideBtnSelect.forEach(element => {
+      element.style.setProperty('width', '20px');
+    });
+    toggle = 1;
+    mainContent.style.setProperty('margin-left', '125px');
+    bottomPlayer.style.setProperty('margin-left', '125px');
+    mediaInfo.style.setProperty('margin-left', '140px');
+  } else {
+    toggle = 0;
+    sideLabel.forEach(element => {
+      element.style.setProperty('display', 'block');
+    });
+    sidePanel.style.setProperty('width', '225px', 'important');
+    sidebarToggleSelect.style.setProperty('background-color', 'rgba(56, 35, 25, 1)', 'important');
+    sideBtnSelect.forEach(element => {
+      element.style.setProperty('width', '175px');
+    });
+    sidebarToggleSelect.style.setProperty('width', '20px', 'important');
+    mainContent.style.setProperty('margin-left', '285px');
+    bottomPlayer.style.setProperty('margin-left', '285px');
+    mediaInfo.style.setProperty('margin-left', '300px');
   }
 });

@@ -11,8 +11,8 @@
     "windows": [
       {
         "title": "Music Player",
-        "width": 900,
-        "height": 800,
+        "width": 1100,
+        "height": 750,
         "minWidth": 1100,
         "minHeight": 750
       }
