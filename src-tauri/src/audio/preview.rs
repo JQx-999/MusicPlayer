@@ -42,10 +42,7 @@ pub(crate) fn decode_preview(path: &str, output_rate: u32) -> Result<Vec<f32>, S
 
     let mut decoded = ffmpeg::frame::Audio::empty();
 
-    // Shared conversion logic for both normal decoding and EOF draining.
     let mut append_frame = |decoded: &ffmpeg::frame::Audio| -> Result<(), String> {
-        // Resampling can produce more output frames than input frames.
-        // Include headroom for the resampler's internal delay.
         let capacity = ((decoded.samples() as u64 * output_rate as u64 + input_rate as u64 - 1)
             / input_rate as u64) as usize
             + 256;
@@ -72,7 +69,6 @@ pub(crate) fn decode_preview(path: &str, output_rate: u32) -> Result<Vec<f32>, S
         Ok(())
     };
 
-    // Decode every packet from the selected audio stream.
     for (packet_stream, packet) in input.packets() {
         if packet_stream.index() != stream_index {
             continue;
@@ -85,17 +81,14 @@ pub(crate) fn decode_preview(path: &str, output_rate: u32) -> Result<Vec<f32>, S
         }
     }
 
-    // Drain delayed decoder frames.
     decoder.send_eof().map_err(|e| e.to_string())?;
 
     while decoder.receive_frame(&mut decoded).is_ok() {
         append_frame(&decoded)?;
     }
 
-    // Release the closure's mutable borrow before flushing the resampler.
     drop(append_frame);
 
-    // Drain remaining samples held internally by the resampler.
     loop {
         let mut tail = ffmpeg::frame::Audio::new(
             ffmpeg::format::Sample::F32(ffmpeg::format::sample::Type::Packed),

@@ -8,8 +8,6 @@ pub fn extract_artwork(path: &str) -> Result<Option<String>, String> {
     let mut input = ffmpeg::format::input(path).map_err(|e| e.to_string())?;
 
     for (stream, packet) in input.packets() {
-        // Embedded cover artwork is commonly stored as
-        // an attached-picture video stream.
         if stream.parameters().medium() != ffmpeg::media::Type::Video {
             continue;
         }
@@ -22,7 +20,6 @@ pub fn extract_artwork(path: &str) -> Result<Option<String>, String> {
             continue;
         }
 
-        // Common attached cover formats.
         let mime = if data.starts_with(&[0xFF, 0xD8, 0xFF]) {
             "image/jpeg"
         } else if data.starts_with(b"\x89PNG\r\n\x1A\n") {

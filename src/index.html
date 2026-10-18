@@ -1,155 +1,145 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="styles.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Music App</title>
-    <script type="module" src="/main.js" defer></script>
-  </head>
-
-  <body>
-      <div class="overlay"></div>
-      <div class="side-panel">
-          <a class="btn" id="sidebar-toggle">
-              <img src="assets/sidebar-right-symbolic.svg">
-          </a>
-          <a class="btn" id="home">
-              <img src="assets/xsi-user-home-symbolic.svg">
-              <p class="label">Home</p>
-          </a>
-          <a id="search" class="btn">
-              <img src="assets/loupe-symbolic.svg">
-              <p class="label">Search</p>
-          </a>
-          <a id="collections" class="btn">
-              <img src="assets/music-playlist-symbolic.svg">
-              <p class="label">Collections</p>
-          </a>
-          <a id="stream" class="btn">
-              <img src="assets/radiowaves-1-symbolic.svg">
-              <p class="label">Stream</p>
-          </a>
-      </div>
-      <div class="main-content">
-          <div class="main-overlay"></div>
-          <div class="main-section" id="home-section">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" href="styles.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Music App</title>
+        <script type="module" src="/main.js" defer></script>
+    </head>
+    <body>
+        <div class="overlay"></div>
+        <div class="side-panel">
+            <a class="btn" id="sidebar-toggle">
+                <img src="assets/sidebar-right-symbolic.svg">
+            </a>
+            <a class="btn" id="home">
+                <img src="assets/xsi-user-home-symbolic.svg">
+                <p class="label">Home</p>
+            </a>
+            <a id="search" class="btn">
+                <img src="assets/loupe-symbolic.svg">
+                <p class="label">Search</p>
+            </a>
+            <a id="collections" class="btn">
+                <img src="assets/music-playlist-symbolic.svg">
+                <p class="label">Collections</p>
+            </a>
+            <a id="stream" class="btn">
+                <img src="assets/radiowaves-1-symbolic.svg">
+                <p class="label">Stream</p>
+            </a>
+        </div>
+        <div class="main-content">
+            <div class="main-overlay"></div>
+            <div class="main-section" id="home-section">
                 <h1 id="title">Audio Player</h1>
                 <a class="add-files" id="file-btn">
                     <img src="assets/plus-symbolic.svg">
                     <p>Play Files</p>
                 <a/>
                 <section class="recents-section">
-                  <div class="recents-header">
-                    <h2>Recents:</h2>
-                    <a id="clear-recents" type="button">
-                      Clear
-                    </d>
-                  </div>
-
-                  <div id="recents-list" class="recents-list">
-                    <p class="recents-empty">Your recently played songs will appear here.</p>
-                  </div>
+                    <div class="recents-header">
+                        <h2>Recents:</h2>
+                        <a id="clear-recents" type="button">
+                            Clear
+                        </a>
+                    </div>
+                    <div id="recents-list" class="recents-list">
+                        <p class="recents-empty">Your recently played songs will appear here.</p>
+                    </div>
                 </section>
-          </div>
-          <div class="main-section search-section" id="search-section">
-              <h1>Search</h1>
+            </div>
+            <div class="main-section search-section" id="search-section">
+                <h1>Search</h1>
 
-              <input id="library-search-input" type="search" spellcheck="false" name="query" class="query" placeholder="Type here to search...">
-              <button id="choose-music-directory" type="button">
+                <input id="library-search-input" type="search" spellcheck="false" name="query" class="query" placeholder="Type here to search...">
+                <button id="choose-music-directory" type="button">
                     <img src="assets/folder-loupe-symbolic.svg">
-              </button>
-              <p id="library-status">Choose a music folder to begin.</p>
-              <div id="library-results"></div>
-          </div>
-          <div class="main-section collections-section" id="collections-section">
-              <div class="collections-header">
-                  <h1>Collections</h1>
-                  <button id="new-playlist" type="button">+ New Playlist</button>
+                </button>
+                <p id="library-status">Choose a music folder to begin.</p>
+                <div id="library-results"></div>
+            </div>
+            <div class="main-section collections-section" id="collections-section">
+                <div class="collections-header">
+                    <h1>Collections</h1>
+                    <button id="new-playlist" type="button">+ New Playlist</button>
                 </div>
-
                 <div id="playlist-grid" class="playlist-grid"></div>
-
                 <div id="playlist-detail" class="playlist-detail" hidden>
-                  <button id="playlist-back" type="button">← Back</button>
-                  <h2 id="playlist-detail-name"></h2>
-
-                  <div class="playlist-actions">
-                    <button id="playlist-play-all" type="button">Play All</button>
-                    <button id="playlist-add-track" type="button">Add Music</button>
-                    <button id="playlist-delete" type="button">Delete Playlist</button>
-                  </div>
-
-                  <div id="playlist-tracks"></div>
+                    <button id="playlist-back" type="button">← Back</button>
+                    <h2 id="playlist-detail-name"></h2>
+                    <div class="playlist-actions">
+                        <button id="playlist-play-all" type="button">Play All</button>
+                        <button id="playlist-add-track" type="button">Add Music</button>
+                        <button id="playlist-delete" type="button">Delete Playlist</button>
+                    </div>
+                    <div id="playlist-tracks"></div>
                 </div>
-          </div>
-          <div class="main-section stream-section" id="stream-section">
-              <h1>Stream</h1>
-              <div class="radio-search-bar">
-                  <input
-                    id="radio-search"
-                    type="search"
-                    placeholder="Search stations..."
-                    autocomplete="off"
-                    spellcheck="false"
-                  />
-
-                  <button id="radio-search-btn" type="button">
-                    Search
-                  </button>
+            </div>
+            <div class="main-section stream-section" id="stream-section">
+                <h1>Stream</h1>
+                <div class="radio-search-bar">
+                    <input
+                        id="radio-search"
+                        type="search"
+                        placeholder="Search stations..."
+                        autocomplete="off"
+                        spellcheck="false"
+                    />
+                    <button id="radio-search-btn" type="button">
+                        Search
+                    </button>
                 </div>
-
                 <p id="radio-status">Search for a station to begin.</p>
-
                 <div id="radio-results" class="radio-results"></div>
                 <div class="radio-now-playing" id="radio-now-playing" hidden>
-                  <div class="radio-now-playing-info">
-                    <span class="radio-live-label">● LIVE RADIO</span>
-                    <strong id="radio-station-name">No station selected</strong>
-                    <span id="radio-playback-status">Stopped</span>
-                  </div>
-
-                  <button id="radio-stop-btn" type="button">
-                    Stop Radio
-                  </button>
+                    <div class="radio-now-playing-info">
+                        <span class="radio-live-label">● LIVE RADIO</span>
+                        <strong id="radio-station-name">No station selected</strong>
+                        <span id="radio-playback-status">Stopped</span>
+                    </div>
+                    <button id="radio-stop-btn" type="button">
+                        Stop Radio
+                    </button>
                 </div>
-          </div>
-      </div>
-      <div class="bottom-bar">
-          <div class="player">
-                  <div class="media-info">
-                      <a>
-                      <div id="music-name">Audio Player</div>
-                      </a>
-                      <div class="media-status">
-                          <p id="current-time">0:00</p>
-                          <div class="slider">
-                              <input type="range" min="0" max="100" value="25" step="0.1" class="progress-slider" id="progress-slider">
-                          </div>
-                          <p id="total-time">5:00</p>
-                      </div>
-                  </div>
-                  <div class="controls">
-                      <a id="prev-btn">
-                          <img src="assets/media-seek-backward-symbolic.svg">
-                      </a>
-                      <a id="play-btn">
-                          <img src="assets/media-playback-start-symbolic.svg" id="play-img">
-                      </a>
-                      <a id="next-btn">
-                          <img src="assets/media-seek-forward-symbolic.svg">
-                      </a>
-                  </div>
-              <div class="volume">
-                  <a id="mute-btn">
-                      <img src="assets/xsi-audio-volume-high-symbolic.svg" id="audio-img">
-                  </a>
-                  <div class="slider">
-                      <input type="range" min="0" max="100" value="100" class="volume-slider" id="volume-slider">
-                  </div>
-              </div>
-          </div>
-      </div>
-  </body>
-  <script type="module" src="main.js"></script>
+            </div>
+        </div>
+        <div class="bottom-bar">
+            <div class="player">
+                <div class="media-info">
+                    <a>
+                          <div id="music-name">Audio Player</div>
+                    </a>
+                    <div class="media-status">
+                        <p id="current-time">0:00</p>
+                        <div class="slider">
+                            <input type="range" min="0" max="100" value="25" step="0.1" class="progress-slider" id="progress-slider">
+                        </div>
+                        <p id="total-time">5:00</p>
+                    </div>
+                </div>
+                <div class="controls">
+                    <a id="prev-btn">
+                        <img src="assets/media-seek-backward-symbolic.svg">
+                    </a>
+                    <a id="play-btn">
+                        <img src="assets/media-playback-start-symbolic.svg" id="play-img">
+                    </a>
+                    <a id="next-btn">
+                        <img src="assets/media-seek-forward-symbolic.svg">
+                    </a>
+                </div>
+                <div class="volume">
+                    <a id="mute-btn">
+                        <img src="assets/xsi-audio-volume-high-symbolic.svg" id="audio-img">
+                    </a>
+                    <div class="slider">
+                        <input type="range" min="0" max="100" value="100" class="volume-slider" id="volume-slider">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script type="module" src="main.js"></script>
 </html>

@@ -1040,33 +1040,52 @@ const bottomPlayer = document.querySelector(".player");
 const mediaInfo = document.querySelector(".media-info");
 
 let toggle = 0;
+
 sidebarToggle.addEventListener("click", function () {
+
   if (toggle == 0) {
     sideLabel.forEach(element => {
       element.style.setProperty('display', 'none');
     });
+
     sidePanel.style.setProperty('width', '70px', 'important');
+
     sidebarToggleSelect.style.setProperty('background-color', 'rgba(0, 0, 0, 0.1)', 'important');
+
     sideBtnSelect.forEach(element => {
       element.style.setProperty('width', '20px');
     });
+
     toggle = 1;
+
     mainContent.style.setProperty('margin-left', '125px');
+
     bottomPlayer.style.setProperty('margin-left', '125px');
+
     mediaInfo.style.setProperty('margin-left', '140px');
+
   } else {
+
     toggle = 0;
+
     sideLabel.forEach(element => {
       element.style.setProperty('display', 'block');
     });
+
     sidePanel.style.setProperty('width', '225px', 'important');
+
     sidebarToggleSelect.style.setProperty('background-color', 'rgba(56, 35, 25, 1)', 'important');
+
     sideBtnSelect.forEach(element => {
       element.style.setProperty('width', '175px');
     });
+
     sidebarToggleSelect.style.setProperty('width', '20px', 'important');
+
     mainContent.style.setProperty('margin-left', '285px');
+
     bottomPlayer.style.setProperty('margin-left', '285px');
+
     mediaInfo.style.setProperty('margin-left', '300px');
   }
 });

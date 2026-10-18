@@ -7,20 +7,15 @@ pub struct TrackInfo {
 }
 
 pub fn read_track(path: &str) -> Result<TrackInfo, String> {
-    // Initialize FFmpeg
     ffmpeg::init().map_err(|e| e.to_string())?;
 
-    // Open the selected music file
     let context = ffmpeg::format::input(path).map_err(|e| e.to_string())?;
 
-    // Find the best audio stream
     let _audio_stream = context
         .streams()
         .best(ffmpeg::media::Type::Audio)
         .ok_or("No audio stream found")?;
 
-    // FFmpeg reports container duration
-    // in AV_TIME_BASE units.
     let raw_duration = context.duration();
 
     let duration = if raw_duration >= 0 {
