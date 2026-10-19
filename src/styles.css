@@ -5,8 +5,10 @@ VARIABLES
 */
 
 
+
+
 :root {
-  --primary-color: rgba(25, 25, 25, 1);
+  --primary-color: rgba(15, 15, 15, 1);
   --color: rgba(255, 255, 255, 0.8);
   --overlay-color: rgb(0, 0, 0);
   --background-portion: rgba(255, 255, 255, 0.05);
@@ -14,6 +16,7 @@ VARIABLES
   --button-color: rgb(50, 50, 50);
   --filter-ico: invert(0);
   --recent-art: rgba(0, 0, 0, 0.25);
+  --title-font: 35px;
 }
 
 .light-theme {
@@ -34,6 +37,21 @@ CANVAS
 ----------------------------------------------
 */
 
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
 input[type="search"] {
   -webkit-appearance: none;
@@ -300,6 +318,11 @@ MAIN-SECTION
 */
 
 
+h1 {
+    font-size: var(--title-font);
+    transition: font-size 0.5s ease;
+}
+
 .music-thumbnail {
     position: fixed;
     height: 75px;
@@ -319,11 +342,8 @@ MAIN-SECTION
     .thumbnail-img {
         width: 75px;
         height: 75px;
+        opacity: 1;
     }
-}
-
-h1 {
-    font-size: 40px;
 }
 
 .main-content {
@@ -353,8 +373,9 @@ HOME
 */
 
 
-.home-section {
+#home-section {
     display: block;
+    padding-bottom: 150px;
 }
 
 .add-files {
@@ -493,9 +514,10 @@ SEARCH
 */
 
 
-.search-section{
+#search-section{
     display: none;
     animation: entry 0.5s ease;
+    padding-bottom: 150px;
 }
 
 
@@ -576,6 +598,7 @@ COLLECTIONS
 .collections-section {
     display: none;
     animation: entry 0.5s ease;
+    padding-bottom: 150px;
 
     button {
         padding: 12px;
@@ -694,6 +717,7 @@ STREAM
 .stream-section {
     display: none;
     animation: entry 0.5s ease;
+    padding-bottom: 150px;
 }
 
 .stream-page {
@@ -882,6 +906,7 @@ OPTIONS
 .options-section {
     display: none;
     animation: entry 0.5s ease;
+    padding-bottom: 150px;
     button:hover {
         animation: hover 0.2s ease;
         transform: translate(0, -2px);
@@ -964,4 +989,13 @@ OPTIONS
 .css-buttons {
     display: flex;
     flex-direction: row;
+}
+
+#font-size-title {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: solid 2px rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 6px rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 0 15px;
+    color: var(--color);
 }

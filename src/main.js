@@ -1,7 +1,9 @@
 import {
   getRecents,
   addRecent,
-  clearRecents
+  clearRecents,
+  getRecentArtwork,
+  migrateRecentArtwork
 } from "./recents.js";
 
 import { initRadio } from "./radio.js";
@@ -261,7 +263,7 @@ async function loadSong(index) {
       metadata = metadataResult.value;
     }
 
-    addRecent({
+    await addRecent({
       path,
       title: metadata.title,
       artist: metadata.artist,
@@ -269,7 +271,7 @@ async function loadSong(index) {
       artwork
     });
 
-    renderRecents();
+    await renderRecents();
 
     const nameElement =
       document.querySelector("#music-name");
@@ -608,9 +610,14 @@ progressSlider?.addEventListener("change", async event => {
 // RECENTLY PLAYED
 // --------------------------------------------------
 
-function renderRecents() {
+let recentsRenderVersion = 0;
+
+async function renderRecents() {
+  const version = ++recentsRenderVersion;
+
   const container =
     document.querySelector("#recents-list");
+
   const musicThumbnail =
     document.querySelector(".music-thumbnail");
 
@@ -620,25 +627,50 @@ function renderRecents() {
 
   container.replaceChildren();
 
+  // Main music thumbnail
   if (musicThumbnail) {
-      musicThumbnail.replaceChildren();
+    musicThumbnail.replaceChildren();
 
-      if (recents.length > 0 && recents[0].artwork) {
-        const thumbImg = document.createElement("img");
-        thumbImg.src = recents[0].artwork;
-        thumbImg.className = "thumbnail-img";
-        thumbImg.alt = "Current track artwork";
+    if (recents.length > 0) {
+      const latestTrack = recents[0];
 
-        thumbImg.addEventListener("error", () => {
-          thumbImg.remove();
-          musicThumbnail.textContent = "🎶";
-        });
+      // Display fallback while artwork loads.
+      musicThumbnail.textContent = "🎶";
 
-        musicThumbnail.appendChild(thumbImg);
-      } else {
-        musicThumbnail.textContent = "🎶";
+      try {
+        const artwork =
+          await getRecentArtwork(latestTrack.path);
+
+        // Ignore an outdated render.
+        if (version !== recentsRenderVersion) return;
+
+        if (artwork) {
+          const thumbImg = document.createElement("img");
+
+          thumbImg.src = artwork;
+          thumbImg.className = "thumbnail-img";
+          thumbImg.alt = "Current track artwork";
+
+          thumbImg.addEventListener("error", () => {
+            thumbImg.remove();
+            musicThumbnail.textContent = "🎶";
+          });
+
+          musicThumbnail.replaceChildren(thumbImg);
+        }
+      } catch (error) {
+        console.warn(
+          "[Resonance] Failed to load thumbnail:",
+          error
+        );
       }
+    } else {
+      musicThumbnail.textContent = "🎶";
     }
+  }
+
+  // Stop if a newer render started while artwork was loading.
+  if (version !== recentsRenderVersion) return;
 
   if (recents.length === 0) {
     const empty = document.createElement("p");
@@ -660,22 +692,8 @@ function renderRecents() {
     const art = document.createElement("div");
     art.className = "recent-art";
 
-    if (track.artwork) {
-      const image = document.createElement("img");
-
-      image.src = track.artwork;
-      image.alt = `${track.title} album artwork`;
-      image.loading = "lazy";
-
-      image.addEventListener("error", () => {
-        image.remove();
-        art.textContent = "";
-      });
-
-      art.appendChild(image);
-    } else {
-      art.textContent = "♫";
-    }
+    // Show placeholder immediately.
+    art.textContent = "♫";
 
     const title = document.createElement("span");
     title.className = "recent-title";
@@ -699,6 +717,38 @@ function renderRecents() {
     });
 
     container.appendChild(card);
+
+    // Load each artwork without blocking the other cards.
+    getRecentArtwork(track.path)
+      .then(artwork => {
+        // Ignore outdated renders and missing artwork.
+        if (
+          version !== recentsRenderVersion ||
+          !artwork ||
+          !card.isConnected
+        ) {
+          return;
+        }
+
+        const image = document.createElement("img");
+
+        image.src = artwork;
+        image.alt = `${track.title} album artwork`;
+        image.loading = "lazy";
+
+        image.addEventListener("error", () => {
+          image.remove();
+          art.textContent = "♫";
+        });
+
+        art.replaceChildren(image);
+      })
+      .catch(error => {
+        console.warn(
+          "[Resonance] Failed to load Recent artwork:",
+          error
+        );
+      });
   }
 }
 
@@ -716,12 +766,27 @@ async function playRecent(track) {
 
 document
   .querySelector("#clear-recents")
-  ?.addEventListener("click", () => {
-    clearRecents();
-    renderRecents();
+  ?.addEventListener("click", async () => {
+    // Invalidate any artwork lookups already running.
+    recentsRenderVersion++;
+
+    await clearRecents();
+    await renderRecents();
   });
 
-renderRecents();
+// Migrate old Base64 artwork before the first render.
+(async () => {
+  try {
+    await migrateRecentArtwork();
+  } catch (error) {
+    console.warn(
+      "[Resonance] Recent artwork migration failed:",
+      error
+    );
+  }
+
+  await renderRecents();
+})();
 
 // --------------------------------------------------
 // PAGE NAVIGATION
@@ -733,7 +798,7 @@ const collectionsBtn = document.getElementById("collections");
 const streamBtn = document.getElementById("stream");
 const optionsBtn = document.getElementById("options")
 
-const sideBtn = document.querySelector(".btn");
+const sideBtn = document.querySelectorAll(".btn");
 
 const homeBtnQuery = document.querySelector("#home");
 const searchBtnQuery = document.querySelector("#search");
@@ -1286,3 +1351,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+const reducedStyle = document.createElement("style");
+reducedStyle.id = 'kill-animations-style';
+reducedStyle.textContent = `
+  *, *::before, *::after {
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+  }
+`;
+let animationsDisabled = false;
+const reducedToggle = document.getElementById("reduce-animation");
+reducedToggle.addEventListener('click', () => {
+  if (!animationsDisabled) {
+    reducedToggle.innerText = 'Enabled';
+    document.head.appendChild(reducedStyle);
+    document.getAnimations().forEach(anim => anim.pause());
+  } else {
+    reducedToggle.innerText = 'Disabled';
+    const existingStyle = document.getElementById('kill-animations-style');
+    if (existingStyle) existingStyle.remove();
+    document.getAnimations().forEach(anim => anim.play());
+  }
+  animationsDisabled = !animationsDisabled;
+});
+
+
+const sizeInput = document.getElementById('font-size-title');
+const headingFont = document.querySelectorAll('h1');
+
+const savedSize = localStorage.getItem('userFontSize') || '35';
+
+sizeInput.value = savedSize;
+headingFont.forEach(h1 => {
+  h1.style.fontSize = `${savedSize}px`;
+});
+
+function updateFontSize() {
+  const newSize = sizeInput.value;
+  headingFont.forEach(h1 => {
+    h1.style.fontSize = `${newSize}px`;
+  });
+  localStorage.setItem('userFontSize', newSize);
+}
+sizeInput.addEventListener('input', updateFontSize);

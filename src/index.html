@@ -35,7 +35,7 @@
             </a>
         </div>
         <div class="main-content">
-            <div class="music-thumbnail"></div>
+            <a class="music-thumbnail"></a>
             <div class="main-overlay"></div>
             <div class="main-section" id="home-section">
                 <h1 id="title">Audio Player</h1>
@@ -121,10 +121,18 @@
                 <div id="options-content">
                     <div class="options-page" id="interface-section">
                         <h2>Interface</h2>
-                        <hr>
+                        <hr style="opacity: 0.2; margin: 25px 0;">
                         <div class="options">
                             <p>Theme :</p>
                             <a class="interface-btn" id="theme-toggle">Dark</a>
+                        </div>
+                        <div class="options">
+                            <p>Reduce animations :</p>
+                            <a class="interface-btn" id="reduce-animation">Disabled</a>
+                        </div>
+                        <div class="options">
+                            <p>Heading font size :</p>
+                            <input id="font-size-title" name="font-size-name" value="35" type="number" min="10" max="100">
                         </div>
                         <div id="custom-css" class="options">
                             <p>Custom CSS / UI (For advanced users):</p>
