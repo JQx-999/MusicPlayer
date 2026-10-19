@@ -10,27 +10,32 @@
     <body>
         <div class="overlay"></div>
         <div class="side-panel">
-            <a class="btn" id="sidebar-toggle">
-                <img src="assets/sidebar-right-symbolic.svg">
+            <a class="btn" id="sidebar-toggle" title="Sidebar Toggle (Use / to enable or disable)">
+                <img src="assets/sidebar-left-symbolic.svg">
             </a>
-            <a class="btn" id="home">
+            <a class="btn" id="home" title="Home">
                 <img src="assets/xsi-user-home-symbolic.svg">
                 <p class="label">Home</p>
             </a>
-            <a id="search" class="btn">
+            <a id="search" class="btn" title="Search">
                 <img src="assets/loupe-symbolic.svg">
                 <p class="label">Search</p>
             </a>
-            <a id="collections" class="btn">
+            <a id="collections" class="btn" title="Collections">
                 <img src="assets/music-playlist-symbolic.svg">
                 <p class="label">Collections</p>
             </a>
-            <a id="stream" class="btn">
+            <a id="stream" class="btn" title="Stream">
                 <img src="assets/radiowaves-1-symbolic.svg">
                 <p class="label">Stream</p>
             </a>
+            <a id="options" class="btn" title="Options">
+                <img src="assets/emblem-system-symbolic.svg">
+                <p class="label">Options</p>
+            </a>
         </div>
         <div class="main-content">
+            <div class="music-thumbnail"></div>
             <div class="main-overlay"></div>
             <div class="main-section" id="home-section">
                 <h1 id="title">Audio Player</h1>
@@ -50,17 +55,16 @@
                     </div>
                 </section>
             </div>
-            <div class="main-section search-section" id="search-section">
+            <div loading="lazy" class="main-section search-section" id="search-section">
                 <h1>Search</h1>
-
                 <input id="library-search-input" type="search" spellcheck="false" name="query" class="query" placeholder="Type here to search...">
-                <button id="choose-music-directory" type="button">
+                <button id="choose-music-directory" type="button" title="Select a folder">
                     <img src="assets/folder-loupe-symbolic.svg">
                 </button>
                 <p id="library-status">Choose a music folder to begin.</p>
                 <div id="library-results"></div>
             </div>
-            <div class="main-section collections-section" id="collections-section">
+            <div loading="lazy" class="main-section collections-section" id="collections-section">
                 <div class="collections-header">
                     <h1>Collections</h1>
                     <button id="new-playlist" type="button">+ New Playlist</button>
@@ -77,7 +81,7 @@
                     <div id="playlist-tracks"></div>
                 </div>
             </div>
-            <div class="main-section stream-section" id="stream-section">
+            <div loading="lazy" class="main-section stream-section" id="stream-section">
                 <h1>Stream</h1>
                 <div class="radio-search-bar">
                     <input
@@ -102,6 +106,47 @@
                     <button id="radio-stop-btn" type="button">
                         Stop Radio
                     </button>
+                </div>
+            </div>
+            <div loading="lazy" class="main-section options-section" id="options-section">
+                <h1>Options</h1>
+                <div id="selector">
+                    <button type="button" id="interface-btn">
+                        Interface
+                    </button>
+                    <button type="button" id="about-btn">
+                        About
+                    </button>
+                </div>
+                <div id="options-content">
+                    <div class="options-page" id="interface-section">
+                        <h2>Interface</h2>
+                        <hr>
+                        <div class="options">
+                            <p>Theme :</p>
+                            <a class="interface-btn" id="theme-toggle">Dark</a>
+                        </div>
+                        <div id="custom-css" class="options">
+                            <p>Custom CSS / UI (For advanced users):</p>
+                            <div class="css-buttons">
+                                <a class="interface-btn" id="custom-css-button">＋ Add</a>
+                                <a class="interface-btn" id="reset-css">Refresh</a>
+                            </div>
+                            <input type="file" id="fileInput" accept=".css, text/css" style="display: none;">
+                        </div>
+                    </div>
+                    <div id="about-section" class="options-page">
+                        <h2>About</h2>
+                        <div id="thanks-giving">
+                            <img src="assets/icon.png" id="icon">
+                            <h2>Thanks for using Music Player!</h2>
+                        </div>
+                        <h3>Author:</h3>
+                        <p>This app was made by JQx_999!</p>
+                        <p>It was made as a personal project. It uses FFmpeg and CPAL for decoding, and providing output stream. This project follows GNU GPL v3 license.</p>
+                        <a href="https://github.com/JQx-999/MusicPlayer">Github Repo</a>
+                        <p>ver 1.0.2</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -131,7 +176,7 @@
                     </a>
                 </div>
                 <div class="volume">
-                    <a id="mute-btn">
+                    <a id="mute-btn" title="Press M to mute">
                         <img src="assets/xsi-audio-volume-high-symbolic.svg" id="audio-img">
                     </a>
                     <div class="slider">

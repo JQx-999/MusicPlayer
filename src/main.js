@@ -18,6 +18,9 @@ const currentTime = document.querySelector("#current-time");
 const totalTime = document.querySelector("#total-time");
 const muteBtn = document.querySelector("#mute-btn");
 const audioImg = document.getElementById("audio-img");
+const thumbnail = document.querySelector(".music-thumbnail")
+
+thumbnail.getAnimations().forEach(animation => animation.pause());
 
 const playlist = [];
 
@@ -225,7 +228,7 @@ async function loadSong(index) {
     await invoke("play_track");
 
     previousPlaybackStatus = "playing";
-
+    thumbnail.getAnimations().forEach(animation => animation.play());
     if (playImage) {
       playImage.src =
         "assets/media-playback-pause-symbolic.svg";
@@ -320,10 +323,13 @@ async function togglePlayback() {
 
     if (state.status === "playing") {
       await invoke("pause_track");
+      thumbnail.getAnimations().forEach(animation => animation.pause());
     } else if (state.status === "paused") {
       await invoke("resume_track");
+      thumbnail.getAnimations().forEach(animation => animation.play());
     } else {
       await invoke("play_track");
+      thumbnail.getAnimations().forEach(animation => animation.play());
     }
 
     await updatePlayerUI();
@@ -357,6 +363,10 @@ window.addEventListener("keydown", event => {
 
   if (event.key.toLowerCase() === "m" && !event.repeat) {
     muteBtn?.click();
+  }
+
+  if (event.key === "/" && !event.repeat) {
+    sidebarToggle?.click();
   }
 });
 
@@ -601,12 +611,34 @@ progressSlider?.addEventListener("change", async event => {
 function renderRecents() {
   const container =
     document.querySelector("#recents-list");
+  const musicThumbnail =
+    document.querySelector(".music-thumbnail");
 
   if (!container) return;
 
   const recents = getRecents();
 
   container.replaceChildren();
+
+  if (musicThumbnail) {
+      musicThumbnail.replaceChildren();
+
+      if (recents.length > 0 && recents[0].artwork) {
+        const thumbImg = document.createElement("img");
+        thumbImg.src = recents[0].artwork;
+        thumbImg.className = "thumbnail-img";
+        thumbImg.alt = "Current track artwork";
+
+        thumbImg.addEventListener("error", () => {
+          thumbImg.remove();
+          musicThumbnail.textContent = "🎶";
+        });
+
+        musicThumbnail.appendChild(thumbImg);
+      } else {
+        musicThumbnail.textContent = "🎶";
+      }
+    }
 
   if (recents.length === 0) {
     const empty = document.createElement("p");
@@ -637,7 +669,7 @@ function renderRecents() {
 
       image.addEventListener("error", () => {
         image.remove();
-        art.textContent = "♫";
+        art.textContent = "";
       });
 
       art.appendChild(image);
@@ -699,6 +731,7 @@ const homeBtn = document.getElementById("home");
 const searchBtn = document.getElementById("search");
 const collectionsBtn = document.getElementById("collections");
 const streamBtn = document.getElementById("stream");
+const optionsBtn = document.getElementById("options")
 
 const sideBtn = document.querySelector(".btn");
 
@@ -707,6 +740,7 @@ const searchBtnQuery = document.querySelector("#search");
 const collectionsBtnQuery =
   document.querySelector("#collections");
 const streamBtnQuery = document.querySelector("#stream");
+const optionsBtnQuery = document.querySelector("#options");
 
 const mainSec = document.querySelector(".main-section");
 const homeSec = document.querySelector("#home-section");
@@ -714,12 +748,14 @@ const searchSec = document.querySelector("#search-section");
 const collectionsSec =
   document.querySelector("#collections-section");
 const streamSec = document.querySelector("#stream-section");
+const optionsSec = document.querySelector("#options-section");
 
 homeBtn?.addEventListener("click", () => {
   mainSec.style.setProperty("display", "none");
   searchSec.style.setProperty("display", "none");
   collectionsSec.style.setProperty("display", "none");
   streamSec.style.setProperty("display", "none");
+  optionsSec.style.setProperty("display", "none");
 
   homeSec.style.setProperty("display", "block");
 
@@ -741,14 +777,20 @@ homeBtn?.addEventListener("click", () => {
 
   homeBtnQuery.style.setProperty(
     "background",
-    "rgb(125, 0, 0)"
+    "rgba(125, 0, 0, 0.75)"
   );
+
+  optionsBtnQuery.style.setProperty(
+    "background",
+    "rgba(255, 255, 255, 0.02)"
+  )
 });
 
 searchBtn?.addEventListener("click", () => {
   mainSec.style.setProperty("display", "none");
   collectionsSec.style.setProperty("display", "none");
   streamSec.style.setProperty("display", "none");
+  optionsSec.style.setProperty("display", "none");
 
   searchSec.style.setProperty("display", "block");
 
@@ -760,7 +802,7 @@ searchBtn?.addEventListener("click", () => {
 
   searchBtnQuery.style.setProperty(
     "background",
-    "rgb(0, 75, 0)"
+    "rgba(0, 75, 0, 0.75)"
   );
 
   collectionsBtnQuery.style.setProperty(
@@ -772,12 +814,18 @@ searchBtn?.addEventListener("click", () => {
     "background",
     "rgba(255, 255, 255, 0.02)"
   );
+
+  optionsBtnQuery.style.setProperty(
+    "background",
+    "rgba(255, 255, 255, 0.02)"
+  )
 });
 
 collectionsBtn?.addEventListener("click", () => {
   mainSec.style.setProperty("display", "none");
   searchSec.style.setProperty("display", "none");
   streamSec.style.setProperty("display", "none");
+  optionsSec.style.setProperty("display", "none");
 
   collectionsSec.style.setProperty("display", "block");
 
@@ -789,7 +837,7 @@ collectionsBtn?.addEventListener("click", () => {
 
   collectionsBtnQuery.style.setProperty(
     "background",
-    "rgb(0, 0, 100)"
+    "rgba(0, 0, 100, 0.75)"
   );
 
   searchBtnQuery.style.setProperty(
@@ -801,12 +849,18 @@ collectionsBtn?.addEventListener("click", () => {
     "background",
     "rgba(255, 255, 255, 0.02)"
   );
+
+  optionsBtnQuery.style.setProperty(
+    "background",
+    "rgba(255, 255, 255, 0.02)"
+  )
 });
 
 streamBtn?.addEventListener("click", () => {
   mainSec.style.setProperty("display", "none");
   searchSec.style.setProperty("display", "none");
   collectionsSec.style.setProperty("display", "none");
+  optionsSec.style.setProperty("display", "none");
 
   streamSec.style.setProperty("display", "block");
 
@@ -818,7 +872,7 @@ streamBtn?.addEventListener("click", () => {
 
   streamBtnQuery.style.setProperty(
     "background",
-    "rgb(0, 75, 75)"
+    "rgba(0, 75, 75, 0.75)"
   );
 
   searchBtnQuery.style.setProperty(
@@ -830,6 +884,46 @@ streamBtn?.addEventListener("click", () => {
     "background",
     "rgba(255, 255, 255, 0.02)"
   );
+
+  optionsBtnQuery.style.setProperty(
+    "background",
+    "rgba(255, 255, 255, 0.02)"
+  )
+});
+
+optionsBtn?.addEventListener("click", () => {
+  mainSec.style.setProperty("display", "none");
+  searchSec.style.setProperty("display", "none");
+  collectionsSec.style.setProperty("display", "none");
+
+  streamSec.style.setProperty("display", "none");
+  optionsSec.style.setProperty("display", "block");
+
+
+  homeBtnQuery.style.setProperty(
+    "background",
+    "rgba(255, 255, 255, 0.02)"
+  );
+
+  streamBtnQuery.style.setProperty(
+    "background",
+    "rgba(255, 255, 255, 0.02)"
+  );
+
+  searchBtnQuery.style.setProperty(
+    "background",
+    "rgba(255, 255, 255, 0.02)"
+  );
+
+  collectionsBtnQuery.style.setProperty(
+    "background",
+    "rgba(255, 255, 255, 0.02)"
+  );
+
+  optionsBtnQuery.style.setProperty(
+    "background",
+    "rgba(75, 0, 75, 0.75)"
+  )
 });
 
 // --------------------------------------------------
@@ -1039,16 +1133,15 @@ const mainContent = document.querySelector(".main-content");
 const bottomPlayer = document.querySelector(".player");
 const mediaInfo = document.querySelector(".media-info");
 
-let toggle = 0;
+let toggle = 1;
 
 sidebarToggle.addEventListener("click", function () {
-
   if (toggle == 0) {
     sideLabel.forEach(element => {
       element.style.setProperty('display', 'none');
     });
 
-    sidePanel.style.setProperty('width', '70px', 'important');
+    sidePanel.style.setProperty('width', '65px', 'important');
 
     sidebarToggleSelect.style.setProperty('background-color', 'rgba(0, 0, 0, 0.1)', 'important');
 
@@ -1058,11 +1151,7 @@ sidebarToggle.addEventListener("click", function () {
 
     toggle = 1;
 
-    mainContent.style.setProperty('margin-left', '125px');
-
-    bottomPlayer.style.setProperty('margin-left', '125px');
-
-    mediaInfo.style.setProperty('margin-left', '140px');
+    mainContent.style.setProperty('left', '110px');
 
   } else {
 
@@ -1074,7 +1163,7 @@ sidebarToggle.addEventListener("click", function () {
 
     sidePanel.style.setProperty('width', '225px', 'important');
 
-    sidebarToggleSelect.style.setProperty('background-color', 'rgba(56, 35, 25, 1)', 'important');
+    sidebarToggleSelect.style.setProperty('background-color', 'rgba(56, 35, 25, 0.75)', 'important');
 
     sideBtnSelect.forEach(element => {
       element.style.setProperty('width', '175px');
@@ -1082,10 +1171,118 @@ sidebarToggle.addEventListener("click", function () {
 
     sidebarToggleSelect.style.setProperty('width', '20px', 'important');
 
-    mainContent.style.setProperty('margin-left', '285px');
+    mainContent.style.setProperty('left', '270px');
 
-    bottomPlayer.style.setProperty('margin-left', '285px');
-
-    mediaInfo.style.setProperty('margin-left', '300px');
   }
+});
+
+// --------------------------------------------------
+// OPTIONS
+// --------------------------------------------------
+
+const interfaceBtn = document.getElementById("interface-btn");
+const aboutBtn = document.getElementById("about-btn");
+
+const optionsPage = document.querySelectorAll(".options-page");
+
+const interfacePage = document.querySelector("#interface-section");
+const aboutPage = document.querySelector("#about-section");
+
+aboutBtn.addEventListener("click", function () {
+  optionsPage.forEach(element => {
+    element.style.setProperty('display', 'none');
+  });
+  aboutPage.style.setProperty('display', 'block');
+});
+
+interfaceBtn.addEventListener("click", function () {
+  optionsPage.forEach(element => {
+    element.style.setProperty('display', 'none');
+  });
+  interfacePage.style.setProperty('display', 'block');
+});
+
+
+
+const uploadBtn = document.getElementById("custom-css-button");
+const fileInput = document.getElementById("fileInput");
+
+document.addEventListener('DOMContentLoaded', () => {
+  const savedCSS = localStorage.getItem('userCustomCSS');
+  if (savedCSS) {
+    applyCSSToPage(savedCSS);
+  }
+});
+
+uploadBtn.addEventListener('click', () => {
+   fileInput.click();
+ });
+
+
+fileInput.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const cssContent = e.target.result;
+
+    applyCSSToPage(cssContent);
+
+    localStorage.setItem('userCustomCSS', cssContent);
+  };
+  reader.readAsText(file);
+});
+
+
+function applyCSSToPage(cssText) {
+
+  const existingStyle = document.getElementById('custom-runtime-theme');
+  if (existingStyle) existingStyle.remove();
+
+  const styleTag = document.createElement('style');
+  styleTag.id = 'custom-runtime-theme';
+  styleTag.textContent = cssText;
+
+  document.head.appendChild(styleTag);
+}
+const resetBtn = document.getElementById('reset-css');
+
+resetBtn.addEventListener('click', () => {
+  localStorage.removeItem('userCustomCSS');
+
+  const customStyle = document.getElementById('custom-runtime-theme');
+  if (customStyle) {
+    customStyle.remove();
+  }
+  document.getElementById('fileInput').value = '';
+
+});
+
+const savedTheme = localStorage.getItem('theme');
+const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+
+if (savedTheme === 'light' || (!savedTheme && systemPrefersLight)) {
+  document.documentElement.classList.add('light-theme');
+} else {
+  document.documentElement.classList.remove('light-theme');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleBtn = document.getElementById('theme-toggle');
+  if (document.documentElement.classList.contains('light-theme')) {
+      toggleBtn.textContent = 'Light';
+  } else {
+    toggleBtn.textContent = 'Dark';
+  }
+  toggleBtn.addEventListener('click', () => {
+    const isLight = document.documentElement.classList.toggle('light-theme');
+
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    if (isLight) {
+      toggleBtn.textContent = 'Light';
+    } else {
+      toggleBtn.textContent = 'Dark';
+    }
+  });
 });
