@@ -3,6 +3,7 @@ use audio::player::{AudioPlayer, PlayerState};
 
 mod audio;
 mod library;
+mod mpris;
 mod radio;
 
 use audio::radio_player::RadioPlayer;
@@ -205,7 +206,7 @@ pub fn run() {
                 .map_err(std::io::Error::other)?;
 
             app.manage(store);
-
+            app.manage(mpris::start(app.handle().clone()));
             Ok(())
         })
         .manage(Arc::new(RadioPlayer::new()))
@@ -240,7 +241,14 @@ pub fn run() {
             add_playlist_track,
             remove_playlist_track,
             delete_playlist,
-            get_track_metadata
+            get_track_metadata,
+            #[cfg(target_os = "linux")]
+            mpris::update_mpris_metadata,
+            #[cfg(target_os = "linux")]
+            mpris::update_mpris_status,
+            mpris::update_mpris_metadata,
+            mpris::update_mpris_status,
+            mpris::cache_mpris_artwork
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

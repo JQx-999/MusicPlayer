@@ -16,6 +16,7 @@ VARIABLES
   --button-color: rgb(50, 50, 50);
   --filter-ico: invert(0);
   --recent-art: rgba(0, 0, 0, 0.25);
+  --media-background: rgba(56, 35, 25, 0.25);
   --title-font: 35px;
 }
 
@@ -28,6 +29,7 @@ VARIABLES
     --button-color: rgb(220, 220, 220, 0.45);
     --filter-ico: invert(100%);
     --recent-art: rgba(255, 255, 255, 0.25);
+    --media-background: rgba(255, 177, 140, 0.25);
 }
 
 
@@ -261,7 +263,7 @@ BOTTOM_BAR / PLAYER
 .media-info {
     display: flex;
     flex-direction: column;
-    background-color: rgba(56, 35, 25, 0.25);
+    background-color: var(--media-background);
     padding: 5px 20px;
     border-radius: 23px;
     outline: 2px solid rgba(255, 255, 255, 0.02);
@@ -442,7 +444,7 @@ HOME
     min-width: 0;
     padding: 12px;
     border-radius: 20px;
-    background-color: rgba(56, 35, 25, 0.25);
+    background-color: var(--media-background);
     border: 2px solid rgba(255, 255, 255, 0.05);
     cursor: pointer;
     text-align: left;
@@ -569,7 +571,7 @@ SEARCH
     color: var(--color);
     border: 2px solid rgba(255, 255, 255, 0.05);
     box-shadow: 1px 2px 10px rgba(255, 255, 255, 0.1);
-    background-color: rgba(56, 35, 25, 0.1);
+    background-color: var(--media-background);
     margin-bottom: 10px;
 }
 
@@ -604,7 +606,7 @@ COLLECTIONS
         padding: 12px;
         font-size: 20px;
         border: 2px solid rgba(255, 255, 255, 0.075);
-        background-color: rgba(56, 35, 25, 0.25);
+        background-color: var(--media-background);
         padding: 12px;
         border-radius: 15px;
         box-shadow: 0px 5px rgba(255, 255, 255, 0.1);
@@ -793,7 +795,7 @@ STREAM
     padding: 12px;
     border: 2px solid rgba(255, 255, 255, 0.05);
     border-radius: 16px;
-    background: rgba(56, 35, 25, 0.25);
+    background: var(--media-background);
     box-shadow: 0px 5px rgba(255, 255, 255, 0.1);
     color: var(--color);
     font: inherit;
@@ -854,7 +856,7 @@ STREAM
     border: 2px solid rgba(255, 255, 255, 0.1);
     border-radius: 14px;
     box-shadow: 0px 5px 10px rgba(255, 255, 255, 0.1);
-    background-color: rgba(56, 35, 25, 0.5);
+    background-color: var(--media-background);
 }
 
 .radio-now-playing[hidden] {
@@ -968,10 +970,11 @@ OPTIONS
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    font-weight: bold;
+    font-weight: normal;
     margin-bottom: 15px;
     a {
         padding: 0px 10px;
+        font-weight: bold;
         height: 45px;
         width: 75px;
         background-color: rgba(255, 255, 255, 0.2);
@@ -998,4 +1001,13 @@ OPTIONS
     border-radius: 15px;
     padding: 0 15px;
     color: var(--color);
+}
+
+#color-picker {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: solid 2px rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 6px rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    height: 45px;
+    width: 100px;
 }

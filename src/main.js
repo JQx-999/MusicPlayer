@@ -198,6 +198,7 @@ setInterval(async () => {
 // LOAD SONG
 // --------------------------------------------------
 
+
 async function loadSong(index) {
   if (
     index < 0 ||
@@ -212,6 +213,7 @@ async function loadSong(index) {
   const path = playlist[index];
 
   try {
+    // 1. Stop Internet Radio before loading local music.
     if (currentStation) {
       await invoke("stop_radio");
 
@@ -222,6 +224,7 @@ async function loadSong(index) {
       updateRadioControls();
     }
 
+    // 2. Load and start the selected track.
     await invoke("load_track", { path });
 
     currentTrackIndex = index;
@@ -230,7 +233,11 @@ async function loadSong(index) {
     await invoke("play_track");
 
     previousPlaybackStatus = "playing";
-    thumbnail.getAnimations().forEach(animation => animation.play());
+
+    thumbnail
+      .getAnimations()
+      .forEach(animation => animation.play());
+
     if (playImage) {
       playImage.src =
         "assets/media-playback-pause-symbolic.svg";
@@ -238,6 +245,7 @@ async function loadSong(index) {
 
     playBtn?.classList.add("is-playing");
 
+    // 3. Prepare fallback metadata.
     let artwork = null;
 
     let metadata = {
@@ -249,6 +257,7 @@ async function loadSong(index) {
       album: "Unknown Album"
     };
 
+    // 4. Extract artwork and track metadata concurrently.
     const [artResult, metadataResult] =
       await Promise.allSettled([
         invoke("get_album_art", { path }),
@@ -257,22 +266,126 @@ async function loadSong(index) {
 
     if (artResult.status === "fulfilled") {
       artwork = artResult.value;
+    } else {
+      console.warn(
+        "[Resonance] Artwork extraction failed:",
+        artResult.reason
+      );
     }
 
+    // IMPORTANT: Assign extracted metadata BEFORE publishing MPRIS.
     if (metadataResult.status === "fulfilled") {
-      metadata = metadataResult.value;
+      const extracted = metadataResult.value;
+
+      const validText = value =>
+        typeof value === "string" &&
+        value.trim().length > 0;
+
+      metadata = {
+        title: validText(extracted?.title)
+          ? extracted.title.trim()
+          : metadata.title,
+
+        artist: validText(extracted?.artist)
+          ? extracted.artist.trim()
+          : metadata.artist,
+
+        album: validText(extracted?.album)
+          ? extracted.album.trim()
+          : metadata.album
+      };
+    } else {
+      console.warn(
+        "[Resonance] Metadata extraction failed:",
+        metadataResult.reason
+      );
     }
 
-    await addRecent({
-      path,
-      title: metadata.title,
-      artist: metadata.artist,
-      album: metadata.album,
-      artwork
-    });
+    console.log(
+      "[Resonance] Final track metadata:",
+      metadata
+    );
 
-    await renderRecents();
+    // 5. Cache album artwork for Linux MPRIS.
+    let mprisArtUrl = null;
 
+    if (
+      typeof artwork === "string" &&
+      artwork.startsWith("data:image/")
+    ) {
+      try {
+        mprisArtUrl = await invoke(
+          "cache_mpris_artwork",
+          {
+            imageData: artwork
+          }
+        );
+
+        console.log(
+          "[MPRIS] Cached artwork URI:",
+          mprisArtUrl
+        );
+      } catch (error) {
+        console.warn(
+          "[MPRIS] Could not cache album artwork:",
+          error
+        );
+      }
+    }
+
+    // 6. Publish COMPLETE metadata to Linux media controls.
+    // Only one metadata update, after extraction and artwork caching.
+    try {
+      const state = await invoke("get_player_state");
+
+      await invoke("update_mpris_metadata", {
+        metadata: {
+          title: metadata.title,
+          artist: metadata.artist,
+          album: metadata.album,
+          artUrl: mprisArtUrl,
+          duration: state.duration || 0
+        }
+      });
+
+      await invoke("update_mpris_status", {
+        status: "playing"
+      });
+
+      console.log(
+        "[MPRIS] Published track:",
+        metadata.title,
+        metadata.artist,
+        metadata.album
+      );
+    } catch (error) {
+      // MPRIS errors must not interrupt actual music playback.
+      console.warn(
+        "[MPRIS] Media controls update failed:",
+        error
+      );
+    }
+
+    // 7. Save the track to Recents.
+    // Recents errors should not mark a playing song as failed.
+    try {
+      await addRecent({
+        path,
+        title: metadata.title,
+        artist: metadata.artist,
+        album: metadata.album,
+        artwork
+      });
+
+      await renderRecents();
+    } catch (error) {
+      console.warn(
+        "[Resonance] Could not update Recents:",
+        error
+      );
+    }
+
+    // 8. Update the visible track title.
     const nameElement =
       document.querySelector("#music-name");
 
@@ -286,17 +399,23 @@ async function loadSong(index) {
     );
 
     return true;
+
   } catch (error) {
-    console.error("[Resonance] Failed to load song:", error);
+    console.error(
+      "[Resonance] Failed to load song:",
+      error
+    );
 
     trackLoaded = false;
     previousPlaybackStatus = null;
 
     return false;
+
   } finally {
     playbackTransitioning = false;
   }
 }
+
 
 // --------------------------------------------------
 // PLAY / PAUSE
@@ -1396,3 +1515,85 @@ function updateFontSize() {
   localStorage.setItem('userFontSize', newSize);
 }
 sizeInput.addEventListener('input', updateFontSize);
+
+const picker = document.getElementById("color-picker");
+const root = document.documentElement;
+const lightMode = document.querySelector(".light-theme");
+const resetColor = document.getElementById("reset-color");
+
+const STORAGE_KEY = 'userCustomColor';
+
+function initTheme() {
+    const savedColor = localStorage.getItem(STORAGE_KEY);
+
+    if (savedColor) {
+        root.style.setProperty('--media-background', savedColor);
+        lightMode.style.setProperty('--media-background', savedColor);
+        picker.value = savedColor;
+    } else {
+      picker.value = getCSSVariableDefault('--media-background');
+    }
+}
+
+function getCSSVariableDefault(variableName) {
+    return getComputedStyle(root).getPropertyValue(variableName).trim();
+}
+
+function getCSSVariableDefaultLight(variableName) {
+    return getComputedStyle(lightMode).getPropertyValue(variableName).trim();
+}
+
+picker.addEventListener('input', (e) => {
+  root.style.setProperty('--theme-color', e.target.value);
+  lightMode.style.setProperty('--theme-color', e.target.value);
+});
+
+picker.addEventListener('change', (e) => {
+    localStorage.setItem(STORAGE_KEY, e.target.value);
+});
+
+resetColor.addEventListener('click', () => {
+  localStorage.removeItem(STORAGE_KEY);
+  root.style.removeProperty('--theme-color');
+  lightMode.style.removeProperty('--theme-color');
+  picker.value = getCSSVariableDefault('--theme-color');
+});
+
+initTheme();
+
+
+// --------------------------------------------------
+// NOTIFICATION PLAYING
+// --------------------------------------------------
+
+const { listen } = window.__TAURI__.event;
+
+await listen("resonance://mpris-play-pause", async () => {
+  await togglePlayback();
+});
+
+await listen("resonance://mpris-play", async () => {
+  const state = await invoke("get_player_state");
+
+  if (state.status !== "playing") {
+    await togglePlayback();
+  }
+});
+
+await listen("resonance://mpris-pause", async () => {
+  const state = await invoke("get_player_state");
+
+  if (state.status === "playing") {
+    await togglePlayback();
+  }
+});
+
+await listen("resonance://mpris-next", async () => {
+
+  document.querySelector("#next-btn")?.click();
+});
+
+await listen("resonance://mpris-previous", async () => {
+
+  document.querySelector("#previous-btn")?.click();
+});

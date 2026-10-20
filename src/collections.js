@@ -59,7 +59,8 @@ async function openPlaylist(id) {
 
   selectedPlaylistId = id;
 
-  $("#playlist-grid").hidden = true;
+  $("#playlist-grid").style.setProperty('height', '0');
+  $("#playlist-grid").style.setProperty('visibility', 'hidden');
   $("#playlist-detail").hidden = false;
   $("#playlist-detail-name").textContent = playlist.name;
 
@@ -97,6 +98,7 @@ export async function refreshCollections() {
 
   if (selectedPlaylistId) {
     await openPlaylist(selectedPlaylistId);
+
   } else {
     await renderCollections();
   }
@@ -124,7 +126,8 @@ export function initCollections(onPlayPaths) {
   $("#playlist-back")?.addEventListener("click", async () => {
     selectedPlaylistId = null;
     $("#playlist-detail").hidden = true;
-    $("#playlist-grid").hidden = false;
+    $("#playlist-grid").style.setProperty('visibility', 'visible');
+    $("#playlist-grid").style.setProperty('height', '100%');
     await renderCollections();
   });
 
