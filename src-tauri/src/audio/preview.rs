@@ -114,14 +114,6 @@ pub(crate) fn decode_preview(path: &str, output_rate: u32) -> Result<Vec<f32>, S
         return Err("FFmpeg decoded no audio samples".into());
     }
 
-    let duration = pcm.len() as f64 / (output_rate as f64 * 2.0);
-
-    eprintln!(
-        "[Resonance decoder] {path} | \
-         {duration:.2} seconds | {} samples",
-        pcm.len()
-    );
-
     Ok(pcm)
 }
 pub fn play_preview(path: &str) -> Result<String, String> {

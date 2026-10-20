@@ -93,8 +93,8 @@ pub fn start(app: AppHandle) -> MprisHandle {
 
 #[cfg(target_os = "linux")]
 async fn run(app: AppHandle, mut rx: mpsc::UnboundedReceiver<MprisMessage>) -> Result<(), String> {
-    let player = Player::builder("resonance")
-        .identity("Resonance")
+    let player = Player::builder("musicplayer")
+        .identity("MusicPlayer")
         .can_play(true)
         .can_pause(true)
         .can_control(true)
@@ -106,36 +106,36 @@ async fn run(app: AppHandle, mut rx: mpsc::UnboundedReceiver<MprisMessage>) -> R
 
     let toggle_app = app.clone();
     player.connect_play_pause(move |_| {
-        let _ = toggle_app.emit("resonance://mpris-play-pause", ());
+        let _ = toggle_app.emit("musicplayer://mpris-play-pause", ());
     });
 
     let play_app = app.clone();
     player.connect_play(move |_| {
-        let _ = play_app.emit("resonance://mpris-play", ());
+        let _ = play_app.emit("musicplayer://mpris-play", ());
     });
 
     let pause_app = app.clone();
     player.connect_pause(move |_| {
-        let _ = pause_app.emit("resonance://mpris-pause", ());
+        let _ = pause_app.emit("musicplayer://mpris-pause", ());
     });
 
     let stop_app = app.clone();
     player.connect_stop(move |_| {
-        let _ = stop_app.emit("resonance://mpris-stop", ());
+        let _ = stop_app.emit("musicplayer://mpris-stop", ());
     });
 
     let next_app = app.clone();
 
     player.connect_next(move |_| {
         eprintln!("[MPRIS] Next requested");
-        let _ = next_app.emit("resonance://mpris-next", ());
+        let _ = next_app.emit("musicplayer://mpris-next", ());
     });
 
     let previous_app = app.clone();
 
     player.connect_previous(move |_| {
         eprintln!("[MPRIS] Previous requested");
-        let _ = previous_app.emit("resonance://mpris-previous", ());
+        let _ = previous_app.emit("musicplayer://mpris-previous", ());
     });
 
     let server = player.run();

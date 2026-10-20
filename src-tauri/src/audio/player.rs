@@ -73,12 +73,6 @@ impl AudioPlayer {
             return Err("Invalid audio output configuration".into());
         }
         let pcm = Arc::new(decode_preview(path, config.sample_rate)?);
-        eprintln!(
-            "[Resonance] Loaded {} | {:.2} seconds | {} samples",
-            path,
-            pcm.len() as f64 / (config.sample_rate as f64 * 2.0),
-            pcm.len()
-        );
         if pcm.is_empty() {
             return Err("FFmpeg returned no audio samples".into());
         }

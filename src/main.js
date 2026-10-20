@@ -50,9 +50,9 @@ let currentStation = null;
 async function testEngine() {
   try {
     const response = await invoke("audio_engine_status");
-    console.log("[Resonance] Audio engine:", response);
+    console.log("[musicplayer] Audio engine:", response);
   } catch (error) {
-    console.error("[Resonance] Audio engine error:", error);
+    console.error("[musicplayer] Audio engine error:", error);
   }
 }
 
@@ -104,12 +104,12 @@ async function checkTrackFinished(state) {
 
     if (nextIndex < playlist.length) {
       console.log(
-        `[Resonance] Auto-playing ${nextIndex + 1}/${playlist.length}`
+        `[musicplayer] Auto-playing ${nextIndex + 1}/${playlist.length}`
       );
 
       await loadSong(nextIndex);
     } else {
-      console.log("[Resonance] Playlist finished.");
+      console.log("[musicplayer] Playlist finished.");
 
       trackLoaded = false;
       previousPlaybackStatus = "stopped";
@@ -122,7 +122,7 @@ async function checkTrackFinished(state) {
       }
     }
   } catch (error) {
-    console.error("[Resonance] Auto-next failed:", error);
+    console.error("[musicplayer] Auto-next failed:", error);
   } finally {
     autoAdvancing = false;
   }
@@ -188,7 +188,7 @@ setInterval(async () => {
   try {
     await updatePlayerUI();
   } catch (error) {
-    console.error("[Resonance] Player polling failed:", error);
+    console.error("[musicplayer] Player polling failed:", error);
   } finally {
     playerPollBusy = false;
   }
@@ -264,7 +264,7 @@ async function loadSong(index) {
       artwork = artResult.value;
     } else {
       console.warn(
-        "[Resonance] Artwork extraction failed:",
+        "[musicplayer] Artwork extraction failed:",
         artResult.reason
       );
     }
@@ -290,13 +290,13 @@ async function loadSong(index) {
       };
     } else {
       console.warn(
-        "[Resonance] Metadata extraction failed:",
+        "[musicplayer] Metadata extraction failed:",
         metadataResult.reason
       );
     }
 
     console.log(
-      "[Resonance] Final track metadata:",
+      "[musicplayer] Final track metadata:",
       metadata
     );
 
@@ -368,7 +368,7 @@ async function loadSong(index) {
       await renderRecents();
     } catch (error) {
       console.warn(
-        "[Resonance] Could not update Recents:",
+        "[musicplayer] Could not update Recents:",
         error
       );
     }
@@ -381,7 +381,7 @@ async function loadSong(index) {
     }
 
     console.log(
-      `[Resonance] Playing ${currentTrackIndex + 1}/${playlist.length}:`,
+      `[musicplayer] Playing ${currentTrackIndex + 1}/${playlist.length}:`,
       metadata.title
     );
 
@@ -389,7 +389,7 @@ async function loadSong(index) {
 
   } catch (error) {
     console.error(
-      "[Resonance] Failed to load song:",
+      "[musicplayer] Failed to load song:",
       error
     );
 
@@ -423,7 +423,7 @@ async function togglePlayback() {
     }
 
     if (!trackLoaded || playbackTransitioning) {
-      console.warn("[Resonance] Select a song first.");
+      console.warn("[musicplayer] Select a song first.");
       return;
     }
 
@@ -442,7 +442,7 @@ async function togglePlayback() {
 
     await updatePlayerUI();
   } catch (error) {
-    console.error("[Resonance] Playback error:", error);
+    console.error("[musicplayer] Playback error:", error);
   }
 }
 
@@ -500,7 +500,7 @@ volumeSlider?.addEventListener("input", async event => {
       }
     }
   } catch (error) {
-    console.error("[Resonance] Volume error:", error);
+    console.error("[musicplayer] Volume error:", error);
   }
 });
 
@@ -551,7 +551,7 @@ muteBtn?.addEventListener("click", async () => {
       isMuted ? "Unmute" : "Mute"
     );
   } catch (error) {
-    console.error("[Resonance] Mute failed:", error);
+    console.error("[musicplayer] Mute failed:", error);
   }
 });
 
@@ -628,7 +628,7 @@ async function chooseMusic() {
 
     await loadSong(firstNewIndex);
   } catch (error) {
-    console.error("[Resonance] File picker error:", error);
+    console.error("[musicplayer] File picker error:", error);
   }
 }
 
@@ -706,7 +706,7 @@ progressSlider?.addEventListener("change", async event => {
     await invoke("seek_track", { seconds });
     await updatePlayerUI();
   } catch (error) {
-    console.error("[Resonance] Seeking failed:", error);
+    console.error("[musicplayer] Seeking failed:", error);
   } finally {
     seeking = false;
   }
@@ -763,7 +763,7 @@ async function renderRecents() {
         }
       } catch (error) {
         console.warn(
-          "[Resonance] Failed to load thumbnail:",
+          "[musicplayer] Failed to load thumbnail:",
           error
         );
       }
@@ -811,7 +811,7 @@ async function renderRecents() {
         await playRecent(track);
       } catch (error) {
         console.error(
-          "[Resonance] Failed to play Recent:",
+          "[musicplayer] Failed to play Recent:",
           error
         );
       }
@@ -845,7 +845,7 @@ async function renderRecents() {
       })
       .catch(error => {
         console.warn(
-          "[Resonance] Failed to load Recent artwork:",
+          "[musicplayer] Failed to load Recent artwork:",
           error
         );
       });
@@ -878,7 +878,7 @@ document
     await migrateRecentArtwork();
   } catch (error) {
     console.warn(
-      "[Resonance] Recent artwork migration failed:",
+      "[musicplayer] Recent artwork migration failed:",
       error
     );
   }
@@ -1179,7 +1179,7 @@ async function playRadioStation(station) {
     updateRadioControls();
 
     console.log(
-      "[Resonance Radio] Playing:",
+      "[musicplayer Radio] Playing:",
       station.name
     );
   } catch (error) {
@@ -1189,7 +1189,7 @@ async function playRadioStation(station) {
     updateRadioControls();
 
     console.error(
-      "[Resonance Radio] Start failed:",
+      "[musicplayer Radio] Start failed:",
       error
     );
 
@@ -1217,7 +1217,7 @@ async function pauseRadio() {
     updateRadioControls();
   } catch (error) {
     console.error(
-      "[Resonance Radio] Pause failed:",
+      "[musicplayer Radio] Pause failed:",
       error
     );
   } finally {
@@ -1262,10 +1262,10 @@ async function stopRadio() {
       name.textContent = "Audio Player";
     }
 
-    console.log("[Resonance Radio] Stopped.");
+    console.log("[musicplayer Radio] Stopped.");
   } catch (error) {
     console.error(
-      "[Resonance Radio] Stop failed:",
+      "[musicplayer Radio] Stop failed:",
       error
     );
   } finally {
@@ -1547,11 +1547,11 @@ initTheme();
 
 const { listen } = window.__TAURI__.event;
 
-await listen("resonance://mpris-play-pause", async () => {
+await listen("musicplayer://mpris-play-pause", async () => {
   await togglePlayback();
 });
 
-await listen("resonance://mpris-play", async () => {
+await listen("musicplayer://mpris-play", async () => {
   const state = await invoke("get_player_state");
 
   if (state.status !== "playing") {
@@ -1559,7 +1559,7 @@ await listen("resonance://mpris-play", async () => {
   }
 });
 
-await listen("resonance://mpris-pause", async () => {
+await listen("musicplayer://mpris-pause", async () => {
   const state = await invoke("get_player_state");
 
   if (state.status === "playing") {
@@ -1567,12 +1567,12 @@ await listen("resonance://mpris-pause", async () => {
   }
 });
 
-await listen("resonance://mpris-next", async () => {
+await listen("musicplayer://mpris-next", async () => {
 
   document.querySelector("#next-btn")?.click();
 });
 
-await listen("resonance://mpris-previous", async () => {
+await listen("musicplayer://mpris-previous", async () => {
 
   document.querySelector("#previous-btn")?.click();
 });
