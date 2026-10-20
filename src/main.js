@@ -213,7 +213,6 @@ async function loadSong(index) {
   const path = playlist[index];
 
   try {
-    // 1. Stop Internet Radio before loading local music.
     if (currentStation) {
       await invoke("stop_radio");
 
@@ -224,7 +223,6 @@ async function loadSong(index) {
       updateRadioControls();
     }
 
-    // 2. Load and start the selected track.
     await invoke("load_track", { path });
 
     currentTrackIndex = index;
@@ -245,7 +243,6 @@ async function loadSong(index) {
 
     playBtn?.classList.add("is-playing");
 
-    // 3. Prepare fallback metadata.
     let artwork = null;
 
     let metadata = {
@@ -257,7 +254,6 @@ async function loadSong(index) {
       album: "Unknown Album"
     };
 
-    // 4. Extract artwork and track metadata concurrently.
     const [artResult, metadataResult] =
       await Promise.allSettled([
         invoke("get_album_art", { path }),
@@ -272,8 +268,6 @@ async function loadSong(index) {
         artResult.reason
       );
     }
-
-    // IMPORTANT: Assign extracted metadata BEFORE publishing MPRIS.
     if (metadataResult.status === "fulfilled") {
       const extracted = metadataResult.value;
 
@@ -306,7 +300,6 @@ async function loadSong(index) {
       metadata
     );
 
-    // 5. Cache album artwork for Linux MPRIS.
     let mprisArtUrl = null;
 
     if (
@@ -333,8 +326,6 @@ async function loadSong(index) {
       }
     }
 
-    // 6. Publish COMPLETE metadata to Linux media controls.
-    // Only one metadata update, after extraction and artwork caching.
     try {
       const state = await invoke("get_player_state");
 
@@ -359,15 +350,12 @@ async function loadSong(index) {
         metadata.album
       );
     } catch (error) {
-      // MPRIS errors must not interrupt actual music playback.
       console.warn(
         "[MPRIS] Media controls update failed:",
         error
       );
     }
 
-    // 7. Save the track to Recents.
-    // Recents errors should not mark a playing song as failed.
     try {
       await addRecent({
         path,
@@ -385,7 +373,6 @@ async function loadSong(index) {
       );
     }
 
-    // 8. Update the visible track title.
     const nameElement =
       document.querySelector("#music-name");
 
@@ -746,21 +733,18 @@ async function renderRecents() {
 
   container.replaceChildren();
 
-  // Main music thumbnail
   if (musicThumbnail) {
     musicThumbnail.replaceChildren();
 
     if (recents.length > 0) {
       const latestTrack = recents[0];
 
-      // Display fallback while artwork loads.
       musicThumbnail.textContent = "🎶";
 
       try {
         const artwork =
           await getRecentArtwork(latestTrack.path);
 
-        // Ignore an outdated render.
         if (version !== recentsRenderVersion) return;
 
         if (artwork) {
@@ -788,7 +772,6 @@ async function renderRecents() {
     }
   }
 
-  // Stop if a newer render started while artwork was loading.
   if (version !== recentsRenderVersion) return;
 
   if (recents.length === 0) {
@@ -811,7 +794,6 @@ async function renderRecents() {
     const art = document.createElement("div");
     art.className = "recent-art";
 
-    // Show placeholder immediately.
     art.textContent = "♫";
 
     const title = document.createElement("span");
@@ -837,10 +819,9 @@ async function renderRecents() {
 
     container.appendChild(card);
 
-    // Load each artwork without blocking the other cards.
     getRecentArtwork(track.path)
       .then(artwork => {
-        // Ignore outdated renders and missing artwork.
+
         if (
           version !== recentsRenderVersion ||
           !artwork ||
@@ -886,14 +867,12 @@ async function playRecent(track) {
 document
   .querySelector("#clear-recents")
   ?.addEventListener("click", async () => {
-    // Invalidate any artwork lookups already running.
     recentsRenderVersion++;
 
     await clearRecents();
     await renderRecents();
   });
 
-// Migrate old Base64 artwork before the first render.
 (async () => {
   try {
     await migrateRecentArtwork();

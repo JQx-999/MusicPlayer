@@ -138,7 +138,6 @@ async fn run(app: AppHandle, mut rx: mpsc::UnboundedReceiver<MprisMessage>) -> R
         let _ = previous_app.emit("resonance://mpris-previous", ());
     });
 
-    // The service must process D-Bus calls while we receive updates.
     let server = player.run();
     tokio::pin!(server);
 
@@ -206,7 +205,6 @@ pub fn cache_mpris_artwork(app: tauri::AppHandle, image_data: String) -> Result<
     use std::fs;
     use tauri::Manager;
 
-    // Accept only supported image data URLs.
     let (header, encoded) = image_data
         .split_once(',')
         .ok_or("Invalid artwork data URL")?;
@@ -218,7 +216,6 @@ pub fn cache_mpris_artwork(app: tauri::AppHandle, image_data: String) -> Result<
         _ => return Err("Unsupported artwork format".into()),
     };
 
-    // Prevent unexpectedly large image payloads.
     if encoded.len() > 14_000_000 {
         return Err("Artwork is too large".into());
     }
@@ -245,7 +242,6 @@ pub fn cache_mpris_artwork(app: tauri::AppHandle, image_data: String) -> Result<
 
     fs::write(&image_path, bytes).map_err(|e| e.to_string())?;
 
-    // Properly encodes spaces and special characters in the path.
     let uri =
         tauri::Url::from_file_path(&image_path).map_err(|_| "Could not create artwork file URI")?;
 
