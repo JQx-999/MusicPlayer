@@ -1598,9 +1598,9 @@ await listen("musicplayer://mpris-previous", async () => {
   document.querySelector("#previous-btn")?.click();
 });
 
-// ==========================================
+// --------------------------------------------------
 // MUSIC DRAG & DROP
-// ==========================================
+// --------------------------------------------------
 
 const SUPPORTED_AUDIO_EXTENSIONS = new Set([
   "mp3",
