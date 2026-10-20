@@ -1540,6 +1540,27 @@ resetColor.addEventListener('click', () => {
 
 initTheme();
 
+document.addEventListener('DOMContentLoaded', () => {
+  const fontChanger = document.getElementById('font-types');
+  const storageKey = 'user-selected-font';
+  const resetBtn = document.getElementById('reset-font');
+  const defaultFont = 'system-ui';
+  const savedFont = localStorage.getItem(storageKey);
+  if (savedFont) {
+    document.documentElement.style.setProperty('--font-family', savedFont);
+    fontChanger.value = savedFont;
+  }
+  fontChanger.addEventListener('change', (event) => {
+    const selectedFont = event.target.value;
+    document.documentElement.style.setProperty('--font-family', selectedFont);
+    localStorage.setItem(storageKey, selectedFont);
+    });
+  resetBtn.addEventListener('click', () => {
+    localStorage.removeItem(storageKey);
+    document.documentElement.style.setProperty('--body-font', defaultFont);
+    fontChanger.value = defaultFont;
+  });
+});
 
 // --------------------------------------------------
 // NOTIFICATION PLAYING

@@ -174,7 +174,7 @@ fn set_player_volume(
 
 #[tauri::command]
 fn audio_engine_status() -> String {
-    String::from("Resonance native engine is online!")
+    String::from("musicplayer is active!")
 }
 #[tauri::command]
 fn test_audio_output() -> Result<String, String> {
