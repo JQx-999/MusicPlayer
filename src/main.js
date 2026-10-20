@@ -1597,3 +1597,159 @@ await listen("musicplayer://mpris-previous", async () => {
 
   document.querySelector("#previous-btn")?.click();
 });
+
+// ==========================================
+// MUSIC DRAG & DROP
+// ==========================================
+
+const SUPPORTED_AUDIO_EXTENSIONS = new Set([
+  "mp3",
+  "flac",
+  "wav",
+  "ogg",
+  "opus",
+  "m4a",
+  "aac",
+  "aiff",
+  "aif",
+  "wma"
+]);
+
+let musicDropInitialized = false;
+let musicDropBusy = false;
+
+function isSupportedAudioFile(path) {
+  if (typeof path !== "string") return false;
+
+  const extension = path
+    .split(/[\\/]/)
+    .pop()
+    ?.split(".")
+    .pop()
+    ?.toLowerCase();
+
+  return SUPPORTED_AUDIO_EXTENSIONS.has(extension);
+}
+
+function showMusicDropOverlay() {
+  document
+    .getElementById("music-drop-overlay")
+    ?.classList.add("active");
+}
+
+function hideMusicDropOverlay() {
+  document
+    .getElementById("music-drop-overlay")
+    ?.classList.remove("active");
+}
+
+async function handleDroppedMusic(paths) {
+  if (musicDropBusy) return;
+
+  musicDropBusy = true;
+
+  try {
+    console.log("[DROP] Received paths:", paths);
+
+    const audioPaths = paths.filter(isSupportedAudioFile);
+
+    if (audioPaths.length === 0) {
+      console.warn("[DROP] No supported audio files found.");
+      return;
+    }
+
+    const existingPaths = new Set(playlist);
+
+    const newPaths = audioPaths.filter(path => {
+      if (existingPaths.has(path)) return false;
+
+      existingPaths.add(path);
+      return true;
+    });
+
+    if (newPaths.length === 0) {
+      console.log("[DROP] All files are already in the playlist.");
+      return;
+    }
+
+    const shouldAutoPlay = !trackLoaded && !currentStation;
+
+    const firstNewIndex = playlist.length;
+
+    playlist.push(...newPaths);
+
+    console.log(
+      `[DROP] Added ${newPaths.length} song(s).`,
+      newPaths
+    );
+
+    if (shouldAutoPlay) {
+      console.log("[DROP] Starting first dropped song.");
+
+      const started = await loadSong(firstNewIndex);
+
+      if (!started) {
+        console.error("[DROP] loadSong() returned false.");
+      }
+    } else {
+      console.log(
+        "[DROP] Songs appended; existing playback preserved."
+      );
+    }
+
+  } catch (error) {
+    console.error("[DROP] Failed:", error);
+  } finally {
+    musicDropBusy = false;
+  }
+}
+
+async function initializeMusicDragDrop() {
+  if (musicDropInitialized) return;
+
+  const getCurrentWebview =
+    window.__TAURI__?.webview?.getCurrentWebview;
+
+  if (!getCurrentWebview) {
+    console.error(
+      "[musicplayer] Tauri webview API unavailable."
+    );
+    return;
+  }
+
+  const webview = getCurrentWebview();
+
+  await webview.onDragDropEvent(async event => {
+    const payload = event.payload;
+
+    switch (payload.type) {
+      case "enter":
+        showMusicDropOverlay();
+        break;
+
+      case "over":
+        break;
+
+      case "leave":
+        hideMusicDropOverlay();
+        break;
+
+      case "drop":
+        console.log("[DROP] FILES:", payload.paths);
+
+        hideMusicDropOverlay();
+
+        await handleDroppedMusic(payload.paths);
+
+        break;
+    }
+  });
+
+  musicDropInitialized = true;
+
+  console.log(
+    "[musicplayer] Native music drag & drop initialized."
+  );
+}
+
+await initializeMusicDragDrop();
