@@ -19,6 +19,7 @@ VARIABLES
   --media-background: rgba(56, 35, 25, 0.25);
   --title-font: 35px;
   --font-family: system-ui, sans-serif;
+  --hover-background: rgba(56, 35, 25, 0.5);
 }
 
 .light-theme {
@@ -31,6 +32,7 @@ VARIABLES
     --filter-ico: invert(100%);
     --recent-art: rgba(255, 255, 255, 0.25);
     --media-background: rgba(255, 177, 140, 0.25);
+    --hover-background: rgba(255, 177, 140, 0.5);
 }
 
 
@@ -222,6 +224,7 @@ SIDEBAR
     }
 
     a {
+        cursor: pointer;
         width: 20px;
         height: 50px;
         display: flex;
@@ -237,7 +240,7 @@ SIDEBAR
         margin-top: 7px;
         margin-bottom: 5px;
         border-radius: 20px;
-        transition: width 0.25s ease;
+        transition: width 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
 
         img {
             width: 20px;
@@ -253,7 +256,6 @@ SIDEBAR
     }
 
     a:hover {
-        animation: hover 0.25s ease;
         transform: translate(0, -2px);
         box-shadow: 0px 7px rgba(143, 93, 54, 0.2);
     }
@@ -311,10 +313,11 @@ BOTTOM_BAR / PLAYER
             width: 25px;
             margin-right: 15px;
             filter: var(--filter-ico);
+            cursor: pointer;
+            transition: transform 0.25s ease;
         }
 
         img:hover {
-            animation: hover 0.25s ease;
             transform: translate(0, -3px);
         }
 }
@@ -326,6 +329,7 @@ BOTTOM_BAR / PLAYER
 .media-info {
     display: flex;
     flex-direction: column;
+    width: 300px;
     background-color: var(--media-background);
     padding: 5px 20px;
     border-radius: 23px;
@@ -427,6 +431,7 @@ h1 {
 
 .main-section {
     animation: entry 0.5s ease;
+    transition: all 0.25s ease;
     padding: 20px;
 }
 
@@ -453,6 +458,8 @@ HOME
     justify-content: center;
     align-items: center;
     box-shadow: 0px 7px rgba(184, 77, 0, 0.25);
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.25s ease;
 
     img {
         width: 50px;
@@ -464,6 +471,7 @@ HOME
 
 .add-files:hover {
     animation: hover 0.25s ease;
+    background-color: rgba(184, 77, 0, 0.75);
     transform: translate(0, -2px);
 }
 
@@ -520,7 +528,7 @@ HOME
 .recent-card:hover {
     animation: hover 0.25s ease;
     transform: translate(0, -2px);
-    background: rgba(56, 35, 25, 0.5);
+    background: var(--hover-background);
 }
 
 .recent-art {
@@ -608,6 +616,7 @@ SEARCH
     margin-left: 10px;
     border: 2px solid rgba(255, 255, 255, 0.2);
     background-color: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
     color: white;
     img {
         filter: var(--filter-ico);
@@ -627,29 +636,45 @@ SEARCH
     width: 100%;
     padding: 12px;
     font-size: 20px;
-    border-radius: 10px;
+    border-radius: 25px;
+    height: 175px;
+    box-shadow: 0px 15px var(--primary-color);
+    cursor: pointer;
+    border: 3px solid rgba(255, 255, 255, 0.075);
+    max-width: 250px;
+    overflow: hidden;
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: column;
     justify-content: space-between;
     color: var(--color);
     border: 2px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 1px 2px 10px rgba(255, 255, 255, 0.1);
     background-color: var(--media-background);
     margin-bottom: 10px;
+    transition: background-color 0.25s ease;
+}
+
+.library-track-icon {
+    font-size: 50px;
+    background: var(--background-portion);
+    border-radius: 20px;
+    padding: 10px;
 }
 
 .library-track:hover {
     animation: hover 0.25s ease;
     transform: translate(0, -2px);
+    background-color: var(--hover-background);
 }
 
 #library-results {
     font-size: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.075);
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 12px;
-    border-radius: 15px;
-    box-shadow: 0px 5px rgba(255, 255, 255, 0.1);
+    background-color: transparent;
+    padding: 16px;
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));;
+    justify-content: start;
+    align-items: start;
 }
 
 
@@ -674,12 +699,14 @@ COLLECTIONS
         border-radius: 15px;
         box-shadow: 0px 5px rgba(255, 255, 255, 0.1);
         color: var(--color);
+        transition: background-color 0.25s ease;
+        cursor: pointer;
     }
 
     button:hover {
         animation: hover 0.25s ease;
         transform: translate(0, -2px);
-        background-color: rgba(56, 35, 25, 0.5);
+        background-color: var(--hover-background);
     }
 }
 
@@ -827,6 +854,7 @@ STREAM
     border: 2px solid rgba(255, 255, 255, 0.2);
     background-color: rgba(255, 255, 255, 0.1);
     color: var(--color);
+    cursor: pointer;
 }
 
 #radio-search-btn:hover {
@@ -845,30 +873,43 @@ STREAM
 }
 
 .radio-results {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+
 }
 
 .radio-card {
     width: 100%;
     display: flex;
+    overflow: hidden;
+    flex-direction: column;
     align-items: center;
-    gap: 16px;
+    justify-content: center;
     padding: 12px;
-    border: 2px solid rgba(255, 255, 255, 0.05);
+    border: 3px solid rgba(255, 255, 255, 0.05);
     border-radius: 16px;
     background: var(--media-background);
-    box-shadow: 0px 5px rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 10px rgba(255, 255, 255, 0.1);
     color: var(--color);
     font: inherit;
     text-align: left;
     cursor: pointer;
     transition: background 160ms ease, border-color 160ms ease;
+    strong {
+        text-overflow: ellipsis;
+        width: 250px;
+        text-align: center;
+    }
+    span {
+        text-overflow: ellipsis;
+        width: 250px;
+        text-align: center;
+    }
 }
 
 .radio-card:hover {
-    background: rgba(56, 35, 25, 0.5);
+    background: var(--hover-background);
     border-color: rgba(255, 255, 255, 0.2);
     animation: hover 0.25s ease;
     transform: translate(0, -2px);
@@ -890,7 +931,6 @@ STREAM
     flex: 1;
     min-width: 0;
     flex-direction: column;
-    gap: 6px;
 }
 
 .radio-card-info strong,
@@ -978,6 +1018,8 @@ OPTIONS
     }
     a{
         color: var(--color);
+        transition: all 0.25s ease;
+        cursor: pointer;
     }
     a:hover {
         animation: hover 0.2s ease;
@@ -1022,6 +1064,7 @@ OPTIONS
         border-right: solid 2px rgba(220, 220, 220, 0.2);
         color: var(--color);
         font-size: 16px;
+        cursor: pointer;
     }
 }
 
@@ -1055,6 +1098,8 @@ OPTIONS
 .css-buttons {
     display: flex;
     flex-direction: row;
+    transition: all 0.25s ease;
+    cursor: pointer;
 }
 
 #font-size-title {

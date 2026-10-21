@@ -1000,7 +1000,7 @@ collectionsBtn?.addEventListener("click", () => {
 
   collectionsBtnQuery.style.setProperty(
     "background",
-    "rgba(0, 0, 100, 0.75)"
+    "rgba(0, 0, 100, 0.55)"
   );
 
   searchBtnQuery.style.setProperty(
@@ -1085,7 +1085,7 @@ optionsBtn?.addEventListener("click", () => {
 
   optionsBtnQuery.style.setProperty(
     "background",
-    "rgba(75, 0, 75, 0.75)"
+    "rgba(75, 0, 75, 0.65)"
   )
 });
 
@@ -1326,7 +1326,7 @@ sidebarToggle.addEventListener("click", function () {
 
     sidePanel.style.setProperty('width', '225px', 'important');
 
-    sidebarToggleSelect.style.setProperty('background-color', 'rgba(56, 35, 25, 0.75)', 'important');
+    sidebarToggleSelect.style.setProperty('background-color', 'rgba(56, 35, 25, 0.5)', 'important');
 
     sideBtnSelect.forEach(element => {
       element.style.setProperty('width', '175px');

@@ -42,7 +42,7 @@ function renderResults(tracks) {
     icon.className = "library-track-icon";
     icon.textContent = "♫";
 
-    button.append(icon, title);
+    button.append(title, icon);
     button.title = track.path;
 
     button.addEventListener("click", () => {
