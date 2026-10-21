@@ -13,13 +13,21 @@ import { initMusicSearch } from "./search.js";
 const invoke = window.__TAURI__.core.invoke;
 
 const playBtn = document.querySelector("#play-btn");
+const nowPlayBtn = document.querySelector("#now-play-btn");
 const playImage = document.getElementById("play-img");
+const nowPlayImage = document.getElementById("now-play-img");
 const volumeSlider = document.querySelector("#volume-slider");
+const nowVolumeSlider = document.querySelector("#now-volume-slider");
 const progressSlider = document.querySelector("#progress-slider");
+const nowProgressSlider = document.querySelector("#now-progress-slider");
 const currentTime = document.querySelector("#current-time");
+const nowCurrentTime = document.querySelector("#now-current-time");
 const totalTime = document.querySelector("#total-time");
+const nowTotalTime = document.querySelector("#now-total-time");
 const muteBtn = document.querySelector("#mute-btn");
+const nowMuteBtn = document.querySelector("#now-mute-btn");
 const audioImg = document.getElementById("audio-img");
+const nowAudioImg = document.getElementById("now-audio-img");
 const thumbnail = document.querySelector(".music-thumbnail")
 
 thumbnail.getAnimations().forEach(animation => animation.pause());
@@ -120,6 +128,11 @@ async function checkTrackFinished(state) {
         playImage.src =
           "assets/media-playback-start-symbolic.svg";
       }
+      if (nowPlayImage) {
+        nowPlayImage.src =
+          "assets/media-playback-start-symbolic.svg";
+      }
+
     }
   } catch (error) {
     console.error("[musicplayer] Auto-next failed:", error);
@@ -145,9 +158,19 @@ async function updatePlayerUI() {
     "is-playing",
     state.status === "playing"
   );
+  nowPlayBtn?.classList.toggle(
+    "is-playing",
+    state.status === "playing"
+  );
 
   if (playImage) {
     playImage.src =
+      state.status === "playing"
+        ? "assets/media-playback-pause-symbolic.svg"
+        : "assets/media-playback-start-symbolic.svg";
+  }
+  if (nowPlayImage) {
+    nowPlayImage.src =
       state.status === "playing"
         ? "assets/media-playback-pause-symbolic.svg"
         : "assets/media-playback-start-symbolic.svg";
@@ -157,13 +180,26 @@ async function updatePlayerUI() {
     currentTime.textContent = formatTime(state.position);
   }
 
+  if (nowCurrentTime) {
+    nowCurrentTime.textContent = formatTime(state.position);
+  }
+
   if (totalTime) {
     totalTime.textContent = formatTime(state.duration);
+  }
+
+  if (nowTotalTime) {
+    nowTotalTime.textContent = formatTime(state.duration);
   }
 
   if (progressSlider && !seeking) {
     progressSlider.max = state.duration || 1;
     progressSlider.value = state.position;
+  }
+
+  if (nowProgressSlider && !seeking) {
+    nowProgressSlider.max = state.duration || 1;
+    nowProgressSlider.value = state.position;
   }
 
   const advanced = await checkTrackFinished(state);
@@ -376,6 +412,12 @@ async function loadSong(index) {
     const nameElement =
       document.querySelector("#music-name");
 
+    const nowNameElement = document.querySelector("#now-playing-name");
+
+    if (nowNameElement) {
+      nowNameElement.textContent = metadata.title;
+    }
+
     if (nameElement) {
       nameElement.textContent = metadata.title;
     }
@@ -447,6 +489,7 @@ async function togglePlayback() {
 }
 
 playBtn?.addEventListener("click", togglePlayback);
+nowPlayBtn?.addEventListener("click", togglePlayback);
 
 // --------------------------------------------------
 // KEYBOARD SHORTCUTS
@@ -471,6 +514,7 @@ window.addEventListener("keydown", event => {
 
   if (event.key.toLowerCase() === "m" && !event.repeat) {
     muteBtn?.click();
+    nowMuteBtn?.click();
   }
 
   if (event.key === "/" && !event.repeat) {
@@ -493,6 +537,30 @@ volumeSlider?.addEventListener("input", async event => {
       isMuted = false;
 
       muteBtn?.classList.remove("is-muted");
+      nowMuteBtn?.classList.remove("is-muted");
+
+      if (audioImg) {
+        audioImg.src =
+          "assets/xsi-audio-volume-high-symbolic.svg";
+      }
+    }
+  } catch (error) {
+    console.error("[musicplayer] Volume error:", error);
+  }
+});
+
+nowVolumeSlider?.addEventListener("input", async event => {
+  const volume = Number(event.target.value) / 100;
+
+  try {
+    await invoke("set_player_volume", { volume });
+
+    if (volume > 0) {
+      lastVolume = volume;
+      isMuted = false;
+
+      muteBtn?.classList.remove("is-muted");
+      nowMuteBtn?.classList.remove("is-muted");
 
       if (audioImg) {
         audioImg.src =
@@ -547,6 +615,57 @@ muteBtn?.addEventListener("click", async () => {
     muteBtn?.classList.toggle("is-muted", isMuted);
 
     muteBtn?.setAttribute(
+      "aria-label",
+      isMuted ? "Unmute" : "Mute"
+    );
+  } catch (error) {
+    console.error("[musicplayer] Mute failed:", error);
+  }
+});
+
+nowMuteBtn?.addEventListener("click", async () => {
+  try {
+    if (!isMuted) {
+      const currentVolume = volumeSlider
+        ? Number(volumeSlider.value) / 100
+        : lastVolume;
+
+      if (currentVolume > 0) {
+        lastVolume = currentVolume;
+      }
+
+      await invoke("set_player_volume", { volume: 0 });
+
+      isMuted = true;
+
+      if (nowAudioImg) {
+        nowAudioImg.src =
+          "assets/xsi-audio-volume-muted-symbolic.svg";
+      }
+
+      if (volumeSlider) {
+        volumeSlider.value = 0;
+      }
+    } else {
+      await invoke("set_player_volume", {
+        volume: lastVolume
+      });
+
+      isMuted = false;
+
+      if (nowAudioImg) {
+        nowAudioImg.src =
+          "assets/xsi-audio-volume-high-symbolic.svg";
+      }
+
+      if (volumeSlider) {
+        volumeSlider.value = lastVolume * 100;
+      }
+    }
+
+    nowMuteBtn?.classList.toggle("is-muted", isMuted);
+
+    nowMuteBtn?.setAttribute(
       "aria-label",
       isMuted ? "Unmute" : "Mute"
     );
@@ -657,7 +776,23 @@ document
   });
 
 document
-  .querySelector("#prev-btn")
+  .querySelector("#now-next-btn")
+  ?.addEventListener("click", async () => {
+    if (
+      playlist.length === 0 ||
+      playbackTransitioning
+    ) {
+      return;
+    }
+
+    const next =
+      (currentTrackIndex + 1) % playlist.length;
+
+    await loadSong(next);
+  });
+
+document
+  .querySelector("#now-prev-btn")
   ?.addEventListener("click", async () => {
     if (
       playlist.length === 0 ||
@@ -712,6 +847,41 @@ progressSlider?.addEventListener("change", async event => {
   }
 });
 
+nowProgressSlider?.addEventListener("pointerdown", () => {
+  if (!currentStation) {
+    seeking = true;
+  }
+});
+
+nowProgressSlider?.addEventListener("input", event => {
+  if (currentStation) return;
+
+  seeking = true;
+
+  if (currentTime) {
+    currentTime.textContent =
+      formatTime(Number(event.target.value));
+  }
+});
+
+nowProgressSlider?.addEventListener("change", async event => {
+  if (currentStation) {
+    seeking = false;
+    return;
+  }
+
+  const seconds = Number(event.target.value);
+
+  try {
+    await invoke("seek_track", { seconds });
+    await updatePlayerUI();
+  } catch (error) {
+    console.error("[musicplayer] Seeking failed:", error);
+  } finally {
+    seeking = false;
+  }
+});
+
 // --------------------------------------------------
 // RECENTLY PLAYED
 // --------------------------------------------------
@@ -727,11 +897,42 @@ async function renderRecents() {
   const musicThumbnail =
     document.querySelector(".music-thumbnail");
 
+  const nowPlayingThumbnail = document.querySelector(".now-playing-image");
+
   if (!container) return;
 
   const recents = getRecents();
 
   container.replaceChildren();
+
+  if (nowPlayingThumbnail) {
+    nowPlayingThumbnail.replaceChildren();
+    if (recents.length > 0) {
+      const latestTrack = recents[0];
+      nowPlayingThumbnail.textContent = "🎶";
+      try {
+        const artwork = await getRecentArtwork(latestTrack.path);
+        if (version !== recentsRenderVersion) return;
+        if (artwork) {
+          const thumbImg = document.createElement("img");
+          thumbImg.src = artwork;
+          thumbImg.className = "now-img";
+          thumbImg.addEventListener("error", () => {
+            thumbImg.remove();
+            nowPlayingThumbnail.textContent = "🎶";
+          });
+          nowPlayingThumbnail.replaceChildren(thumbImg);
+        }
+      } catch (error) {
+        console.warn(
+          "[musicplayer] Failed to load thumbnail:",
+          error
+        );
+      }
+    } else {
+      nowPlayingThumbnail.textContent = "🎶"
+    }
+  }
 
   if (musicThumbnail) {
     musicThumbnail.replaceChildren();
@@ -845,7 +1046,7 @@ async function renderRecents() {
       })
       .catch(error => {
         console.warn(
-          "[musicplayer] Failed to load Recent artwork:",
+          "[musicplayer] Failed to load RecentnowPlayingArtist(artist.textContent); artwork:",
           error
         );
       });
@@ -1121,14 +1322,24 @@ function updateRadioControls() {
   }
 
   playBtn?.classList.toggle("is-playing", radioActive);
+  nowPlayBtn?.classList.toggle("is-playing", radioActive);
 
   if (progressSlider) {
     progressSlider.disabled =
       radioActive || radioPaused;
   }
+  if (nowProgressSlider) {
+    nowProgressSlider.disabled =
+      radioActive || radioPaused;
+  }
 
   if (playImage && currentStation) {
     playImage.src = radioActive
+      ? "assets/media-playback-pause-symbolic.svg"
+      : "assets/media-playback-start-symbolic.svg";
+  }
+  if (nowPlayImage && currentStation) {
+    nowPlayImage.src = radioActive
       ? "assets/media-playback-pause-symbolic.svg"
       : "assets/media-playback-start-symbolic.svg";
   }
@@ -1138,17 +1349,28 @@ function showRadioInPlayer() {
   if (!currentStation) return;
 
   const name = document.querySelector("#music-name");
+  const nowName = document.querySelector("#now-playing-name");
+
 
   if (name) {
     name.textContent = currentStation.name;
+  }
+  if (nowName) {
+    nowName.textContent = currentStation.name;
   }
 
   if (currentTime) {
     currentTime.textContent = "LIVE";
   }
+  if (nowCurrentTime) {
+    nowCurrentTime.textContent = "LIVE";
+  }
 
   if (totalTime) {
     totalTime.textContent = "RADIO";
+  }
+  if (nowTotalTime) {
+    nowTotalTime.textContent = "RADIO";
   }
 }
 
@@ -1753,3 +1975,72 @@ async function initializeMusicDragDrop() {
 }
 
 await initializeMusicDragDrop();
+
+
+
+// --------------------------------------------------
+// NOW PLAYING
+// --------------------------------------------------
+
+
+const musicThumbnailBtn = document.getElementById("music-thumbnail");
+const nowPlayingBack = document.getElementById("now-playing-back");
+const nowPlaying = document.querySelector(".now-playing");
+
+let v = 0;
+
+musicThumbnailBtn.addEventListener('click', () => {
+  nowPlaying.style.setProperty('display', 'flex');
+});
+
+nowPlayingBack.addEventListener('click', () => {
+  nowPlaying.style.setProperty('display', 'none');
+});
+
+const nowPlayingFullscreen = document.getElementById("now-playing-fullscreen");
+
+async function toggleFullscreen() {
+  const appWindow = window.__TAURI__.window.getCurrentWindow();
+  const isFullscreen = await appWindow.isFullscreen();
+  await appWindow.setFullscreen(!isFullscreen);
+}
+
+nowPlayingFullscreen.addEventListener('click', toggleFullscreen);
+
+async function exitFullscreen() {
+  try {
+    const appWindow = window.__TAURI__.window.getCurrentWindow();
+
+    const isFullscreen = await appWindow.isFullscreen();
+
+    if (isFullscreen) {
+      await appWindow.setFullscreen(false);
+    }
+  } catch (error) {
+    console.error("Failed to exit fullscreen:", error);
+  }
+}
+
+window.addEventListener('keydown', async (event) => {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+
+    await exitFullscreen();
+    nowPlaying.style.setProperty('display', 'none');
+  }
+  if (event.key.toLowerCase() === 'f') {
+    event.preventDefault();
+
+    await toggleFullscreen();
+    nowPlaying.style.setProperty('display', 'flex');
+  }
+});
+
+function nowPlayingArtist(newText) {
+  const nowArtist = document.getElementById("now-playing-artist");
+  if (nowArtist) {
+    nowArtist.textContent = newText;
+  } else {
+    console.error("Element not found.");
+  }
+}
