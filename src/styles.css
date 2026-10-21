@@ -1231,6 +1231,7 @@ NOW PLAYING
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    margin-left: 25px;
 }
 #now-playing-name {
     font-weight: bold;
@@ -1244,7 +1245,6 @@ NOW PLAYING
     max-width: 500px;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-left: 25px;
 }
 
 
