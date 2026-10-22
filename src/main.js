@@ -1582,11 +1582,20 @@ sidebarToggle.addEventListener("click", function () {
 
 const interfaceBtn = document.getElementById("interface-btn");
 const aboutBtn = document.getElementById("about-btn");
+const keybindsBtn = document.getElementById("keybinds");
 
 const optionsPage = document.querySelectorAll(".options-page");
 
 const interfacePage = document.querySelector("#interface-section");
 const aboutPage = document.querySelector("#about-section");
+const keybindsPage = document.querySelector("#keybinds-section");
+
+keybindsBtn.addEventListener('click', function () {
+  optionsPage.forEach(element => {
+    element.style.setProperty('display', 'none');
+  });
+  keybindsPage.style.setProperty('display', 'block');
+});
 
 aboutBtn.addEventListener("click", function () {
   optionsPage.forEach(element => {
