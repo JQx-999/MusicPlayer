@@ -24,7 +24,7 @@ jobs:
       run: npm install && sudo apt install libglib2.0-dev libgtk-3-dev pkg-config build-essential libwebkit2gtk-4.1-dev libasound2-dev ffmpeg librsvg2-2 librsvg2-bin clang libavcodec-dev libavdevice-dev libavfilter-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev xvfb
 
     - name: Run tests / application
-      run: xvfb-run cargo run
+      run: cd src-tauri && xvfb-run cargo run
 
     - name: Run build / test check
       run: npm run tauri dev
