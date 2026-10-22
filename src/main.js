@@ -1327,6 +1327,8 @@ function updateRadioControls() {
   playBtn?.classList.toggle("is-playing", radioActive);
   nowPlayBtn?.classList.toggle("is-playing", radioActive);
 
+
+
   if (progressSlider) {
     progressSlider.disabled =
       radioActive || radioPaused;
@@ -1354,6 +1356,16 @@ function showRadioInPlayer() {
   const name = document.querySelector("#music-name");
   const nowName = document.querySelector("#now-playing-name");
 
+  const nowPlayingArtist = document.getElementById("now-playing-artist");
+  const nowPlayingThumbnail = document.getElementById("now-playing-image");
+
+  if (nowPlayingThumbnail) {
+    nowPlayingThumbnail.replaceChildren();
+    nowPlayingThumbnail.textContent = "🎶";
+  }
+  if (nowPlayingArtist) {
+    nowPlayingArtist.textContent = "";
+  }
 
   if (name) {
     name.textContent = currentStation.name;
