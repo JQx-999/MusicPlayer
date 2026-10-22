@@ -25,3 +25,6 @@ jobs:
 
     - name: Run tests / application
       run: xvfb-run npm run tauri dev
+
+    - name: KILL APPLICATION
+      run: pkill musicplayer
