@@ -26,6 +26,8 @@
     "active": true,
     "targets": "all",
     "category": "Music",
+    "shortDescription": "A customizable music app made for Linux",
+    "longDescription": "A Music Player application optimised for desktop built natively using Tauri with JavaScript, FFmpeg and CPAL.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
