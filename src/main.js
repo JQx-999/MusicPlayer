@@ -2044,3 +2044,52 @@ function nowPlayingArtist(newText) {
     console.error("Element not found.");
   }
 }
+
+
+// ==========================================
+// OPEN WITH
+// ==========================================
+
+let openWithInitialized = false;
+let openWithProcessing = false;
+
+async function processOpenWithFiles() {
+  if (openWithProcessing) return;
+
+  openWithProcessing = true;
+
+  try {
+    while (true) {
+      const paths = await invoke("take_open_with_files");
+
+      if (!paths.length) break;
+
+      console.log("[OPEN WITH] Received:", paths);
+
+      await handleDroppedMusic(paths);
+    }
+  } catch (error) {
+    console.error("[OPEN WITH] Failed:", error);
+  } finally {
+    openWithProcessing = false;
+  }
+}
+
+async function initializeOpenWith() {
+  if (openWithInitialized) return;
+
+  const { listen } = window.__TAURI__.event;
+
+  await listen("musicplayer://open-with", () => {
+    void processOpenWithFiles();
+  });
+
+  openWithInitialized = true;
+
+  console.log("[OPEN WITH] Initialized");
+
+  await processOpenWithFiles();
+}
+
+await initializeMusicDragDrop();
+await initializeOpenWith();

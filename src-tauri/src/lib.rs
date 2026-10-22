@@ -4,6 +4,8 @@ use audio::player::{AudioPlayer, PlayerState};
 mod audio;
 mod library;
 mod mpris;
+#[cfg(target_os = "linux")]
+mod open_with;
 mod radio;
 
 use audio::radio_player::RadioPlayer;
@@ -206,7 +208,19 @@ pub fn run() {
                 .map_err(std::io::Error::other)?;
 
             app.manage(store);
+            #[cfg(target_os = "linux")]
             app.manage(mpris::start(app.handle().clone()));
+
+            #[cfg(target_os = "linux")]
+            {
+                app.manage(open_with::OpenWithState::default());
+
+                let args: Vec<String> = std::env::args().collect();
+                let cwd = std::env::current_dir()?;
+
+                open_with::queue_files(app.handle(), &args, &cwd);
+            }
+
             Ok(())
         })
         .manage(Arc::new(RadioPlayer::new()))
@@ -214,6 +228,17 @@ pub fn run() {
         .manage(Arc::new(MusicLibrary::new()))
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
+            open_with::queue_files(app, &args, std::path::Path::new(&cwd));
+
+            use tauri::Manager;
+
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.show();
+                let _ = window.unminimize();
+                let _ = window.set_focus();
+            }
+        }))
         .invoke_handler(tauri::generate_handler![
             greet,
             audio_engine_status,
@@ -248,7 +273,8 @@ pub fn run() {
             mpris::update_mpris_status,
             mpris::update_mpris_metadata,
             mpris::update_mpris_status,
-            mpris::cache_mpris_artwork
+            mpris::cache_mpris_artwork,
+            open_with::take_open_with_files
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

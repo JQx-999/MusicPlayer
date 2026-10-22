@@ -1237,12 +1237,11 @@ NOW PLAYING
     font-weight: bold;
     font-size: 50px;
     max-width: 500px;
-    text-align: center;;
+    max-height: 250px;
+    text-align: center;
     text-overflow: ellipsis;
     margin-bottom: 45px;
     opacity: 0.5;
-    white-space: nowrap;
-    max-width: 500px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
