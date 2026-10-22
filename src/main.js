@@ -1361,7 +1361,7 @@ function showRadioInPlayer() {
 
   if (nowPlayingThumbnail) {
     nowPlayingThumbnail.replaceChildren();
-    nowPlayingThumbnail.textContent = "🎶";
+    nowPlayingThumbnail.textContent = "📻";
   }
   if (nowPlayingArtist) {
     nowPlayingArtist.textContent = "";
