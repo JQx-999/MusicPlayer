@@ -1,7 +1,7 @@
 # Music Player
 
 
-<div><img src="src/assets/icon.png" alt="Description" width="100">
+<div><img src="src/assets/icon.png" alt="Icon" width="100">
 </div>
 
 
