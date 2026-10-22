@@ -1176,6 +1176,7 @@ NOW PLAYING
     -moz-appearance: none;
     display: flex;
     justify-content: center;
+    box-shadow: 0px 5px rgba(255, 100, 100, 0.5);
     align-items: center;
     background-color: rgba(255, 0, 0, 0.5);
     opacity: 0.5;
@@ -1305,6 +1306,7 @@ NOW PLAYING
     display: flex;
     justify-content: center;
     background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0px 5px rgba(255, 255, 255, 0.25);
     align-items: center;
     position: fixed;
     top: 50px;
