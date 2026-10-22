@@ -1240,12 +1240,19 @@ NOW PLAYING
     max-height: 250px;
     text-align: center;
     text-overflow: ellipsis;
-    margin-bottom: 45px;
+    margin-bottom: 5px;
+    color: var(--color);
     opacity: 0.5;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+#now-playing-artist {
+    margin-bottom: 25px;
+    text-align: center;
+    max-width: 500px;
+    opacity: 0.75;
+}
 
 #now-prev-btn, #now-play-btn, #now-next-btn {
     margin-right: 25px;

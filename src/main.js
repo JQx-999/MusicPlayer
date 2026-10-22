@@ -392,6 +392,9 @@ async function loadSong(index) {
       );
     }
 
+    const nowPlayingArtist = document.getElementById("now-playing-artist");
+    nowPlayingArtist.textContent = metadata.artist;
+
     try {
       await addRecent({
         path,
