@@ -47,7 +47,7 @@ Feature requests are tracked as GitHub issues. Please provide:
 
 Follow these steps to propose changes.
 
-1. **Setup the OS**
+1. ### Setup the OS
 
     Currently, primary development is tested on **Linux**.
     
@@ -55,25 +55,25 @@ Follow these steps to propose changes.
 
     - Use a linux distro, preferrably Debian, of your choice or setup a virtual machine to use it as a development environment.
 
-    - Install the dependencies:
+    - **Install the dependencies:**
 
-        - **For Debian/Ubuntu based**
+        For Debian/Ubuntu based:
 
-            ```bash
-            sudo apt install libglib2.0-dev libgtk-3-dev pkg-config build-essential libwebkit2gtk-4.1-dev libasound2-dev ffmpeg librsvg2-2 librsvg2-bin clang libavcodec-dev libavdevice-dev libavfilter-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev
-            ```
+        ```bash
+        sudo apt install libglib2.0-dev libgtk-3-dev pkg-config build-essential libwebkit2gtk-4.1-dev libasound2-dev ffmpeg librsvg2-2 librsvg2-bin clang libavcodec-dev libavdevice-dev libavfilter-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev
+        ```
 
-        - **For Fedora/RHEL based**
+        For Fedora/RHEL based:
 
-            ```bash
-            sudo dnf groupinstall "Development Tools" && sudo dnf install glib2-devel gtk3-devel pkgconf-pkg-config webkit2gtk4.1-devel alsa-lib-devel ffmpeg ffmpeg-devel librsvg2 librsvg2-tools clang
-            ```
+        ```bash
+        sudo dnf groupinstall "Development Tools" && sudo dnf install glib2-devel gtk3-devel pkgconf-pkg-config webkit2gtk4.1-devel alsa-lib-devel ffmpeg ffmpeg-devel librsvg2 librsvg2-tools clang
+        ```
 
-        - **For Arch based**
+        For Arch based:
 
-            ```bash
-            sudo pacman -Syu --needed base-devel glib2 gtk3 pkgconf webkit2gtk-4.1 alsa-lib ffmpeg librsvg clang
-            ```
+        ```bash
+        sudo pacman -Syu --needed base-devel glib2 gtk3 pkgconf webkit2gtk-4.1 alsa-lib ffmpeg librsvg clang
+        ```
 
     *Note: If you are running macOS or Windows and run into setup issues, PRs updating our setup docs for those platforms are very welcome!*
 
