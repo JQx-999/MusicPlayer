@@ -47,7 +47,7 @@ Feature requests are tracked as GitHub issues. Please provide:
 
 Follow these steps to propose changes.
 
-1. ### Setup the OS
+1. **Setup the OS**
 
     Currently, primary development is tested on **Linux**.
     
