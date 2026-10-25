@@ -1,0 +1,363 @@
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: local('JetBrainsMono NF'),
+         local('JetBrainsMono-NF'),
+         url('/usr/share/fonts/TTF/JetBrainsMonoNerdFont-Regular.ttf') format('truetype');
+}
+
+:root {
+    --primary-color: #FFF5F5;
+    --color: #4A4A4A;
+    --font-family: serif;
+    --overlay-color: #E2B4BD;
+    --media-background: #FFCB56;
+    --hover-background: #FFA259;
+    --title-font: 75px;
+}
+.light-mode {
+    --primary-color: #FFF5F5;
+    --color: #4A4A4A;
+    --font-family: serif;
+    --overlay-color: #E2B4BD;
+    --media-background: rgba(0, 100, 0, 0.25);
+    --hover-background: rgba(0, 100, 0, 0.5);
+    --title-font: 75px;
+}
+
+/*
+----------------------------------------------
+OVERLAYS
+----------------------------------------------
+*/
+
+.music-drop-content {
+    border-radius: 1px;
+}
+.overlay {
+    display: none;
+}
+.main-overlay {
+    border-radius: 1px;
+}
+
+/*
+----------------------------------------------
+SIDEBAR
+----------------------------------------------
+*/
+
+.side-panel {
+    border-color: green;
+    border-radius: 16px;
+    box-shadow: 0 5px #7DCCAD;
+    a {
+        border-color: transparent;
+        border-radius: 25px;
+        border: solid 3px rgba(0, 255, 0, 0.5);
+        transition: border-left 0.25s ease;
+        img{
+            filter: brightness(0) saturate(100%) invert(63%) sepia(57%) saturate(2442%) hue-rotate(67deg) brightness(123%) contrast(101%);
+        }
+    }
+    a:hover {
+        background-color: #FFD1C9;
+    }
+}
+
+
+/*
+----------------------------------------------
+BOTTOM_BAR / PLAYER
+----------------------------------------------
+*/
+
+.player {
+    border-radius: 16px;
+    border-color: green;
+    box-shadow: 0 5px #7DCCAD;
+    /*img{
+        filter: brightness(0) saturate(100%) invert(63%) sepia(57%) saturate(2442%) hue-rotate(67deg) brightness(123%) contrast(101%);
+    }*/
+}
+
+.media-info {
+    border-radius: 16px;
+    outline-color: rgba(0, 255, 0, 0.2);
+    border: solid 2px green;
+}
+.progress-slider{
+    accent-color: green;
+    width: 100%;
+    height: 15px;
+}
+
+.volume {
+    .slider {
+        accent-color: green;
+    }
+    .volume-slider::-webkit-slider-thumb {
+        border-radius: 1px;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 15px;
+        width: 15px;
+    }
+}
+
+/*
+----------------------------------------------
+MAIN-SECTION
+----------------------------------------------
+*/
+
+.music-thumbnail {
+    border: solid 2px green;
+}
+h1 {
+    padding-bottom: 15px;
+    color: #4A4A4A;
+    border-bottom: 4px dashed transparent;
+    border-image: linear-gradient(to right, #7DCCAD, #FFEA88) 1;
+}
+
+.main-content {
+    border-color: green;
+    border-radius: 25px;
+    box-shadow: 0 5px #7DCCAD;
+}
+
+/*
+----------------------------------------------
+HOME
+----------------------------------------------
+*/
+
+.add-files {
+    background-color: #FFB6A6;
+    border: solid 5px #FFEBD3;
+    border-radius: 42px;
+}
+
+.add-files:hover {
+    background-color: #FF9178;
+}
+
+.recent-card {
+    border-radius: 30px;
+    border: solid 2px green;
+}
+
+.recent-art{
+    border: solid 2px #FFEBD3;
+}
+/*
+----------------------------------------------
+SEARCH
+----------------------------------------------
+*/
+
+.query {
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    border-radius: 16px;
+    border-color: green;
+    font-family: serif;
+}
+#choose-music-directory {
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    border-radius: 16px;
+    border-color: green;
+    img{
+        filter: brightness(0) saturate(100%) invert(63%) sepia(57%) saturate(2442%) hue-rotate(67deg) brightness(123%) contrast(101%);
+    }
+}
+
+.library-track {
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    border-radius: 16px;
+    border-right: solid 10px green;
+    border-color: green;
+    transition: background-color 0.25s ease;
+    font-family: serif;
+}
+.library-track:hover {
+    background-color: #FFEDB9;
+}
+
+.library-track-icon {
+    border-radius: 16px;
+}
+
+/*
+----------------------------------------------
+COLLECTIONS
+----------------------------------------------
+*/
+
+.collections-section {
+    button {
+        border-radius: 16px;
+        box-shadow: 0px 5px #FFB6A6;
+        font-family: serif;
+    }
+}
+
+.playlist-card {
+    border-radius: 1px;
+
+}
+.playlist-card-art {
+    border-radius: 1px;
+}
+
+/*
+----------------------------------------------
+STREAM
+----------------------------------------------
+*/
+
+#radio-search {
+    background-color: #FFB6A6;
+    box-shadow: 0px 5px var(--media-background);
+    border-radius: 16px;
+    border-color: green;
+    font-family: "JetBrains Mono", monospace;
+}
+
+#radio-search-btn {
+    background-color: #FFB6A6;
+    box-shadow: 0px 5px var(--media-background);
+    border-radius: 16px;
+    border-color: green;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: bold;
+}
+.radio-card {
+    background-color: #FFB6A6;
+    box-shadow: 0px 10px var(--media-background);
+    border-radius: 16px;
+    border-color: green;
+    font-family: "JetBrains Mono", monospace;
+    transition: background-color 0.25s ease;
+}
+
+.radio-card:hover{
+    border-color: green;
+    box-shadow: 0px 10px #FFB6A6;
+}
+.radio-card-symbol {
+    border-radius: 16px;border: solid 3px green;
+}
+.radio-now-playing {
+    border-radius: 16px;
+}
+#radio-stop-btn {
+    border-radius: 16px;
+}
+
+/*
+----------------------------------------------
+OPTIONS
+----------------------------------------------
+*/
+
+#selector {
+    border-radius: 16px;
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    border: solid 2px green;
+    button {
+        font-family: serif;
+        font-weight: bold;
+        border: none;
+        border-top: solid 5px rgba(0, 255, 0, 0.5);
+        transition: border-bottom 0.25s ease;
+    }
+    button:hover {
+        border-top: solid 5px rgba(0, 255, 0, 0.75);
+    }
+
+}
+
+.options {
+    a {
+        border-radius: 16px;
+        background-color: var(--hover-background);
+        box-shadow: 0px 5px var(--media-background);
+        transition: background-color 0.25s ease;
+    }
+    a:hover {
+        background-color: rgba(0, 255, 0, 0.25);
+    }
+}
+
+#color-picker {
+    border-radius: 16px;
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    height: 50px;
+}
+
+#font-types {
+    border-radius: 16px;
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    height: 50px;
+    width: 115px;
+    font-family: serif;
+    cursor: pointer;
+}
+#font-size-title {
+    border-radius: 16px;
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    height: 50px;
+    font-family: serif;
+    font-weight: bold;
+}
+.keybinds-option {
+    a {
+        border-radius: 16px;
+        background-color: var(--hover-background);
+        box-shadow: 0px 5px var(--media-background);
+    }
+}
+#about-section {
+    a {
+        border-radius: 1px;
+        background-color: var(--hover-background);
+    }
+}
+
+/*
+----------------------------------------------
+NOW PLAYING
+----------------------------------------------
+*/
+
+.now-playing-back, #now-playing-fullscreen {
+    border-radius: 1px;
+}
+
+.navigation-now {
+    border-radius: 1px;
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+}
+.now-playing-image {
+    border-radius: 1px;
+    border: 2px solid green;
+    transition: transform 0.25s ease;
+}
+.now-playing-image:hover {
+    transform: scale(1.1);
+}
+#now-volume-slider::-webkit-slider-thumb {
+    border-radius: 1px;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 15px;
+    width: 15px;
+}

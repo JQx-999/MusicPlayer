@@ -1,0 +1,370 @@
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: local('JetBrainsMono NF'),
+         local('JetBrainsMono-NF'),
+         url('/usr/share/fonts/TTF/JetBrainsMonoNerdFont-Regular.ttf') format('truetype');
+}
+
+:root {
+    --primary-color: black;
+    --color: rgba(0, 255, 0, 0.75);
+    --font-family: "JetBrains Mono", monospace;
+    --media-background: rgba(0, 100, 0, 0.25);
+    --hover-background: rgba(0, 100, 0, 0.5);
+    --title-font: 75px;
+}
+
+/*
+----------------------------------------------
+OVERLAYS
+----------------------------------------------
+*/
+
+.music-drop-content {
+    border-radius: 1px;
+}
+.overlay {
+    display: none;
+}
+
+/*
+----------------------------------------------
+SIDEBAR
+----------------------------------------------
+*/
+
+.side-panel {
+    border-color: green;
+    border-radius: 1px;
+    a {
+        border-color: transparent;
+        border-radius: 1px;
+        border-left: solid 3px rgba(0, 255, 0, 0.5);
+        transition: border-left 0.25s ease;
+        img{
+            filter: brightness(0) saturate(100%) invert(63%) sepia(57%) saturate(2442%) hue-rotate(67deg) brightness(123%) contrast(101%);
+        }
+    }
+    a:hover {
+        border-left: solid 3px rgba(0, 255, 0, 0.75);
+    }
+}
+
+
+/*
+----------------------------------------------
+BOTTOM_BAR / PLAYER
+----------------------------------------------
+*/
+
+.player {
+    border-radius: 1px;
+    border-color: green;
+    img{
+        filter: brightness(0) saturate(100%) invert(63%) sepia(57%) saturate(2442%) hue-rotate(67deg) brightness(123%) contrast(101%);
+    }
+}
+
+.media-info {
+    border-radius: 1px;
+    outline-color: rgba(0, 255, 0, 0.2);
+    border-left: solid 10px green;
+}
+.progress-slider{
+    accent-color: green;
+    width: 100%;
+    height: 15px;
+}
+
+.volume {
+    .slider {
+        accent-color: green;
+    }
+    .volume-slider::-webkit-slider-thumb {
+        border-radius: 1px;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 15px;
+        width: 15px;
+    }
+}
+
+/*
+----------------------------------------------
+MAIN-SECTION
+----------------------------------------------
+*/
+
+.music-thumbnail {
+    border: solid 2px green;
+}
+h1 {
+    text-align: center;
+    border-bottom: solid 3px green;
+    padding-bottom: 15px;
+}
+
+.main-content {
+    border-color: green;
+    border-radius: 1px;
+}
+
+/*
+----------------------------------------------
+HOME
+----------------------------------------------
+*/
+
+.add-files {
+    background-color: rgba(0, 255, 0, 0.5);
+    width: 100%;
+    box-shadow: 0px 7px rgba(0, 255, 0, 0.25);
+    border-radius: 1px;
+}
+
+.add-files:hover {
+    background-color: rgba(0, 255, 0, 0.75);
+}
+
+.recent-card {
+    border-radius: 1px;
+    padding: 0;
+    border-left: solid 10px green;
+    box-shadow: 0px 5px var(--hover-background);
+}
+
+.recent-title {
+    padding: 0 10px;
+}
+
+.recent-artist {
+    padding: 0 10px;
+    padding-bottom: 10px;
+}
+
+.recent-art {
+    border-radius: 1px;
+}
+
+/*
+----------------------------------------------
+SEARCH
+----------------------------------------------
+*/
+
+.query {
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    border-radius: 1px;
+    border-color: green;
+    font-family: "JetBrains Mono", monospace;
+}
+#choose-music-directory {
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    border-radius: 1px;
+    border-color: green;
+    img{
+        filter: brightness(0) saturate(100%) invert(63%) sepia(57%) saturate(2442%) hue-rotate(67deg) brightness(123%) contrast(101%);
+    }
+}
+
+.library-track {
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    border-radius: 1px;
+    border-left: solid 10px green;
+    border-color: green;
+    transition: background-color 0.25s ease;
+    font-family: "JetBrains Mono", monospace;
+}
+.library-track:hover {
+    background-color: rgba(0, 255, 0, 0.25);
+}
+
+.library-track-icon {
+    border-radius: 1px;
+}
+
+/*
+----------------------------------------------
+COLLECTIONS
+----------------------------------------------
+*/
+
+.collections-section {
+    button {
+        border-radius: 1px;
+        box-shadow: 0px 5px var(--media-background);
+        font-family: "JetBrains Mono", monospace;
+        border-left: solid 10px green;
+    }
+}
+
+.playlist-card {
+    border-radius: 1px;
+
+}
+.playlist-card-art {
+    border-radius: 1px;
+}
+
+/*
+----------------------------------------------
+STREAM
+----------------------------------------------
+*/
+
+#radio-search {
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    border-radius: 1px;
+    border-color: green;
+    font-family: "JetBrains Mono", monospace;
+}
+
+#radio-search-btn {
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    border-radius: 1px;
+    border-color: green;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: bold;
+}
+.radio-card {
+    background-color: var(--hover-background);
+    box-shadow: 0px 10px var(--media-background);
+    border-radius: 1px;
+    border-color: green;
+    font-family: "JetBrains Mono", monospace;
+    transition: background-color 0.25s ease;
+}
+
+.radio-card:hover{
+    background-color: rgba(0, 255, 0, 0.25);
+    box-shadow: 0px 10px var(--hover-background);
+}
+.radio-card-symbol {
+    border-radius: 1px;border-left: solid 10px green;
+}
+.radio-now-playing {
+    border-radius: 1px;
+}
+#radio-stop-btn {
+    border-radius: 1px;
+}
+
+/*
+----------------------------------------------
+OPTIONS
+----------------------------------------------
+*/
+
+#selector {
+    border-radius: 1px;
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    button {
+        font-family: "JetBrains Mono", monospace;
+        font-weight: bold;
+        border: none;
+        border-bottom: solid 5px rgba(0, 255, 0, 0.5);
+        transition: border-bottom 0.25s ease;
+    }
+    button:hover {
+        border-bottom: solid 5px rgba(0, 255, 0, 0.75);
+    }
+
+}
+
+.options {
+    a {
+        border-radius: 1px;
+        background-color: var(--hover-background);
+        box-shadow: 0px 5px var(--media-background);
+        transition: background-color 0.25s ease;
+    }
+    a:hover {
+        background-color: rgba(0, 255, 0, 0.25);
+    }
+}
+
+#color-picker {
+    border-radius: 1px;
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    height: 50px;
+}
+
+#font-types {
+    border-radius: 1px;
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    height: 50px;
+    width: 115px;
+    font-family: "JetBrains Mono", monospace;
+    cursor: pointer;
+}
+#font-size-title {
+    border-radius: 1px;
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+    height: 50px;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: bold;
+}
+.keybinds-option {
+    a {
+        border-radius: 1px;
+        background-color: var(--hover-background);
+        box-shadow: 0px 5px var(--media-background);
+    }
+}
+#about-section {
+    a {
+        border-radius: 1px;
+        background-color: var(--hover-background);
+        box-shadow: 0px 5px var(--media-background);
+    }
+}
+
+/*
+----------------------------------------------
+NOW PLAYING
+----------------------------------------------
+*/
+
+.now-playing-back, #now-playing-fullscreen {
+    border-radius: 1px;
+}
+
+.navigation-now {
+    border-radius: 1px;
+    background-color: var(--hover-background);
+    box-shadow: 0px 5px var(--media-background);
+}
+.now-playing-image {
+    border-radius: 1px;
+    border: 2px solid green;
+    transition: transform 0.25s ease;
+}
+.now-playing-image:hover {
+    transform: scale(1.1);
+}
+#now-prev-btn, #now-play-btn, #now-next-btn {
+    img{
+        filter: brightness(0) saturate(100%) invert(63%) sepia(57%) saturate(2442%) hue-rotate(67deg) brightness(123%) contrast(101%);
+    }
+}
+#now-mute-btn {
+    img{
+        filter: brightness(0) saturate(100%) invert(63%) sepia(57%) saturate(2442%) hue-rotate(67deg) brightness(123%) contrast(101%);
+    }
+}
+#now-volume-slider::-webkit-slider-thumb {
+    border-radius: 1px;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 15px;
+    width: 15px;
+}
