@@ -920,10 +920,15 @@ async function renderRecents() {
           const thumbImg = document.createElement("img");
           thumbImg.src = artwork;
           thumbImg.className = "now-img";
+
+
+
           thumbImg.addEventListener("error", () => {
             thumbImg.remove();
             nowPlayingThumbnail.textContent = "🎶";
           });
+
+
           nowPlayingThumbnail.replaceChildren(thumbImg);
         }
       } catch (error) {
@@ -957,6 +962,26 @@ async function renderRecents() {
           thumbImg.src = artwork;
           thumbImg.className = "thumbnail-img";
           thumbImg.alt = "Current track artwork";
+
+          if (thumbImg) {
+            const bgContainer = document.querySelector('.now-playing');
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = thumbImg.naturalWidth || thumbImg.width;
+            canvas.height = thumbImg.naturalHeight || thumbImg.height;
+            ctx.drawImage(thumbImg, 0, 0);
+            const p1 = ctx.getImageData(canvas.width * 0.2, canvas.height * 0.2, 1, 1).data;
+            const p2 = ctx.getImageData(canvas.width * 0.8, canvas.height * 0.5, 1, 1).data;
+            const p3 = ctx.getImageData(canvas.width * 0.5, canvas.height * 0.8, 1, 1).data;
+
+            const color1 = `rgba(${p1[0]}, ${p1[1]}, ${p1[2]}, 1)`;
+            const color2 = `rgb(${p2[0]}, ${p2[1]}, ${p2[2]}, 0.5)`;
+            const color3 = `rgb(${p3[0]}, ${p3[1]}, ${p3[2]}, 1)`;
+
+            bgContainer.style.setProperty('--color1', color1);
+            bgContainer.style.setProperty('--color2', color2);
+            bgContainer.style.setProperty('--color3', color3);
+          }
 
           thumbImg.addEventListener("error", () => {
             thumbImg.remove();

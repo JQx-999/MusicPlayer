@@ -203,7 +203,6 @@ impl AudioPlayer {
         }
         .map_err(|e| e.to_string())?;
 
-        // Keep the stream alive after this function returns.
         *stream_slot = Some(stream);
 
         Ok(())

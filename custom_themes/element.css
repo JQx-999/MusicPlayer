@@ -334,6 +334,10 @@ NOW PLAYING
 ----------------------------------------------
 */
 
+.now-playing {
+    text-shadow: 2px 2px black;
+}
+
 .now-playing-back, #now-playing-fullscreen {
     border-radius: 1px;
 }
