@@ -1191,7 +1191,7 @@ NOW PLAYING
         radial-gradient(circle at 50% 50%, var(--color3) 0%, transparent 60%),
         radial-gradient(circle at 100% 100%, var(--color1));
     background-size: 200% 200%;
-    animation: gradientShift 30s ease infinite;
+    animation: entry 0.25s ease, gradientShift 30s ease infinite;
     transition: background 1.5s ease-in-out;
     z-index: 102;
     display: none;
