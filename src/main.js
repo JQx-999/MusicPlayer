@@ -974,9 +974,9 @@ async function renderRecents() {
             const p2 = ctx.getImageData(canvas.width * 0.8, canvas.height * 0.5, 1, 1).data;
             const p3 = ctx.getImageData(canvas.width * 0.5, canvas.height * 0.8, 1, 1).data;
 
-            const color1 = `rgba(${p1[0]}, ${p1[1]}, ${p1[2]}, 1)`;
-            const color2 = `rgb(${p2[0]}, ${p2[1]}, ${p2[2]}, 0.5)`;
-            const color3 = `rgb(${p3[0]}, ${p3[1]}, ${p3[2]}, 1)`;
+            const color1 = `rgba(${p1[0]}, ${p1[1]}, ${p1[2]}, 0.5)`;
+            const color2 = `rgba(${p2[0]}, ${p2[1]}, ${p2[2]}, 0.5)`;
+            const color3 = `rgba(${p3[0]}, ${p3[1]}, ${p3[2]}, 0.5)`;
 
             bgContainer.style.setProperty('--color1', color1);
             bgContainer.style.setProperty('--color2', color2);
