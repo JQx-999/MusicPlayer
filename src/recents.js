@@ -154,7 +154,7 @@ async function optimizeArtwork(artwork) {
 
     return optimized || original;
   } catch (error) {
-    console.warn("[Resonance] Artwork optimization failed:", error);
+    console.warn("[musicplayer] Artwork optimization failed:", error);
     return original;
   } finally {
     bitmap?.close();
@@ -221,7 +221,7 @@ export function getRecents() {
       .slice(0, MAX_RECENTS);
 
   } catch (error) {
-    console.error("[Resonance] Failed to load recents:", error);
+    console.error("[musicplayer] Failed to load recents:", error);
     return [];
   }
 }
@@ -254,9 +254,9 @@ export async function migrateRecentArtwork() {
       JSON.stringify(lightweight)
     );
 
-    console.log("[Resonance] Recent artwork migrated successfully.");
+    console.log("[musicplayer] Recent artwork migrated successfully.");
   } catch (error) {
-    console.warn("[Resonance] Artwork migration incomplete:", error);
+    console.warn("[musicplayer] Artwork migration incomplete:", error);
   }
 }
 
@@ -272,7 +272,7 @@ export async function getRecentArtwork(path) {
 
     return getRecents().find(track => track.path === path)?.artwork || null;
   } catch (error) {
-    console.warn("[Resonance] Failed to retrieve artwork:", error);
+    console.warn("[musicplayer] Failed to retrieve artwork:", error);
 
     return getRecents().find(track => track.path === path)?.artwork || null;
   }
@@ -308,7 +308,7 @@ export async function addRecent(track) {
         }
       }
     } catch (error) {
-      console.warn("[Resonance] Could not cache artwork:", error);
+      console.warn("[musicplayer] Could not cache artwork:", error);
     }
   }
 
@@ -325,7 +325,7 @@ export async function addRecent(track) {
       JSON.stringify(lightweight)
     );
   } catch (error) {
-    console.error("[Resonance] Could not save Recents:", error);
+    console.error("[musicplayer] Could not save Recents:", error);
     return previous;
   }
 
@@ -334,7 +334,7 @@ export async function addRecent(track) {
       new Set(lightweight.map(item => item.path))
     );
   } catch (error) {
-    console.warn("[Resonance] Artwork cleanup failed:", error);
+    console.warn("[musicplayer] Artwork cleanup failed:", error);
   }
 
   return updated;
@@ -345,6 +345,6 @@ export async function clearRecents() {
     localStorage.removeItem(STORAGE_KEY);
     await clearArtworkDB();
   } catch (error) {
-    console.error("[Resonance] Failed to clear recents:", error);
+    console.error("[musicplayer] Failed to clear recents:", error);
   }
 }

@@ -104,7 +104,6 @@ export async function refreshCollections() {
   }
 }
 
-// Call only after the Collections HTML exists.
 export function initCollections(onPlayPaths) {
   playPaths = onPlayPaths;
 

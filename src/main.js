@@ -356,6 +356,29 @@ async function loadSong(index) {
           "[MPRIS] Cached artwork URI:",
           mprisArtUrl
         );
+
+        const nowPlayImage = document.getElementById("now-playing-image");
+        nowPlayImage.textContent = "🎶"
+        if (mprisArtUrl) {
+          nowPlayImage.replaceChildren();
+          const thumbImg = document.createElement("img");
+          const cleanPath = mprisArtUrl.replace(/^file:\/\//, '');
+          const assetUrl = window.__TAURI__.core.convertFileSrc(cleanPath);
+          thumbImg.src = assetUrl;
+          thumbImg.className = "now-img";
+          thumbImg.loading = 'lazy';
+          thumbImg.addEventListener("error", () => {
+            thumbImg.remove();
+            nowPlayImage.textContent = "🎶";
+          });
+          nowPlayImage.replaceChildren(thumbImg);
+
+        } else {
+          nowPlayImage.textContent = "🎶"
+        }
+
+
+
       } catch (error) {
         console.warn(
           "[MPRIS] Could not cache album artwork:",
@@ -918,7 +941,7 @@ async function renderRecents() {
   const musicThumbnail =
     document.querySelector(".music-thumbnail");
 
-  const nowPlayingThumbnail = document.querySelector(".now-playing-image");
+  const nowPlayingThumbnail = document.querySelector(".demo");
 
   if (!container) return;
 
@@ -976,7 +999,6 @@ async function renderRecents() {
 
         if (artwork) {
           const thumbImg = document.createElement("img");
-
           thumbImg.src = artwork;
           thumbImg.className = "thumbnail-img";
           thumbImg.alt = "Current track artwork";
@@ -1680,6 +1702,7 @@ uploadBtn.addEventListener('click', () => {
 
 fileInput.addEventListener('change', (event) => {
   const file = event.target.files[0];
+  console.log(file);
   if (!file) return;
 
   const reader = new FileReader();

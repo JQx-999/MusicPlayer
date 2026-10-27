@@ -65,7 +65,6 @@ async function refreshSearch() {
   try {
     const tracks = await invoke("search_music", { query });
 
-    // Ignore results from an older request.
     if (version !== searchVersion) return;
 
     renderResults(tracks);
@@ -108,7 +107,6 @@ async function chooseDirectory() {
   await scanFolder(folder);
 }
 
-// Call this AFTER your Search HTML exists.
 export function initMusicSearch(playTrack) {
   onTrackSelected = playTrack;
 
@@ -127,7 +125,6 @@ export function initMusicSearch(playTrack) {
   const savedFolder = localStorage.getItem(FOLDER_KEY);
 
   if (savedFolder) {
-    // Restore the index without opening a file picker.
     scanFolder(savedFolder);
   }
 }
