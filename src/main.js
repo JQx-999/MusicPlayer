@@ -6,7 +6,6 @@ import {
   migrateRecentArtwork
 } from "./recents.js";
 
-document.addEventListener('contextmenu', (event) => event.preventDefault());
 
 
 import { initRadio } from "./radio.js";
