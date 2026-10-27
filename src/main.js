@@ -6,6 +6,9 @@ import {
   migrateRecentArtwork
 } from "./recents.js";
 
+document.addEventListener('contextmenu', (event) => event.preventDefault());
+
+
 import { initRadio } from "./radio.js";
 import { initCollections } from "./collections.js";
 import { initMusicSearch } from "./search.js";
@@ -891,6 +894,22 @@ nowProgressSlider?.addEventListener("change", async event => {
 
 let recentsRenderVersion = 0;
 
+function getLuminance(r, g, b) {
+    return 0.299 * r + 0.587 * g + 0.114 * b;
+}
+
+// Helper function to boost saturation and contrast of an RGB array
+function enhanceColor(rgb, factor = 1.3, brighten = false) {
+    let [r, g, b] = rgb;
+
+    // Simple contrast/stretch adjustment
+    r = Math.min(255, Math.max(0, (r - 128) * factor + 128));
+    g = Math.min(255, Math.max(0, (g - 128) + 128));
+    b = Math.min(255, Math.max(0, (b - 128) * factor + 128));
+
+    return [Math.round(r), Math.round(g), Math.round(b)];
+}
+
 async function renderRecents() {
   const version = ++recentsRenderVersion;
 
@@ -974,9 +993,16 @@ async function renderRecents() {
             const p2 = ctx.getImageData(canvas.width * 0.8, canvas.height * 0.5, 1, 1).data;
             const p3 = ctx.getImageData(canvas.width * 0.5, canvas.height * 0.8, 1, 1).data;
 
-            const color1 = `rgba(${p1[0]}, ${p1[1]}, ${p1[2]}, 0.5)`;
-            const color2 = `rgba(${p2[0]}, ${p2[1]}, ${p2[2]}, 0.5)`;
-            const color3 = `rgba(${p3[0]}, ${p3[1]}, ${p3[2]}, 0.5)`;
+            const pixels = [
+                { rgb: [p1[0], p1[1], p1[2]], lum: getLuminance(p1[0], p1[1], p1[2]) },
+                { rgb: [p2[0], p2[1], p2[2]], lum: getLuminance(p2[0], p2[1], p2[2]) },
+                { rgb: [p3[0], p3[1], p3[2]], lum: getLuminance(p3[0], p3[1], p3[2]) }
+            ];
+            pixels.sort((a, b) => a.lum - b.lum);
+
+            const color1 = `rgb(${pixels[0].rgb.join(',')}, 1)`;
+            const color2 = `rgb(${enhanceColor(pixels[1].rgb, 1.4).join(',')}, 1)`;
+            const color3 = `rgb(${pixels[2].rgb.join(',')}, 1)`;
 
             bgContainer.style.setProperty('--color1', color1);
             bgContainer.style.setProperty('--color2', color2);
@@ -1566,7 +1592,7 @@ sidebarToggle.addEventListener("click", function () {
       element.style.setProperty('display', 'none');
     });
 
-    sidePanel.style.setProperty('width', '65px', 'important');
+    sidePanel.style.setProperty('width', '53px', 'important');
 
     sidebarToggleSelect.style.setProperty('background-color', 'rgba(0, 0, 0, 0.1)', 'important');
 
@@ -1576,7 +1602,7 @@ sidebarToggle.addEventListener("click", function () {
 
     toggle = 1;
 
-    mainContent.style.setProperty('left', '110px');
+    mainContent.style.setProperty('left', '78px');
 
   } else {
 
@@ -1586,7 +1612,7 @@ sidebarToggle.addEventListener("click", function () {
       element.style.setProperty('display', 'block');
     });
 
-    sidePanel.style.setProperty('width', '225px', 'important');
+    sidePanel.style.setProperty('width', '210px', 'important');
 
     sidebarToggleSelect.style.setProperty('background-color', 'rgba(56, 35, 25, 0.5)', 'important');
 
@@ -1596,7 +1622,7 @@ sidebarToggle.addEventListener("click", function () {
 
     sidebarToggleSelect.style.setProperty('width', '20px', 'important');
 
-    mainContent.style.setProperty('left', '270px');
+    mainContent.style.setProperty('left', '235px');
 
   }
 });

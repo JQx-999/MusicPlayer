@@ -17,7 +17,7 @@ VARIABLES
   --filter-ico: invert(0);
   --recent-art: rgba(0, 0, 0, 0.25);
   --media-background: rgba(56, 35, 25, 0.25);
-  --title-font: 35px;
+  --title-font: 45px;
   --font-family: system-ui, sans-serif;
   --color1: rgba(10, 10, 10, 0.25);
   --color2: rgba(10, 10, 10, 0.5);
@@ -214,17 +214,17 @@ SIDEBAR
     flex-direction: column;
     position: fixed;
     z-index: 101;
-    padding: 0px 10px;
+    padding: 0px 7px;
     padding-top: 10px;
-    padding-bottom: 90px;
+    padding-bottom: 77px;
     overflow: hidden;
-    top: 10px;
-    left: 15px;
-    bottom: 115px;
-    width: 65px;
+    top: 5px;
+    left: 5px;
+    bottom: 95px;
+    width: 53px;
     background: var(--background-portion);
     border-radius: 20px;
-    border: solid 2px rgba(255, 255, 255, 0.1);
+    border: solid 2px rgba(255, 255, 255, 0.2);
     transition: width 0.25s ease;
 
     #home {
@@ -241,11 +241,10 @@ SIDEBAR
         align-items: center;
         overflow: hidden;
         background-color: var(--sidebutton-color);
-        padding-top: 5px;
         border: solid 2px rgba(255, 255, 255, 0.1);
-        box-shadow: 0px 6px rgba(255, 255, 255, 0.05);
+        box-shadow: 0px 5px rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(12px);
-        padding: 5px 20px;
+        padding: 0px 15px;
         margin-top: 7px;
         margin-bottom: 5px;
         border-radius: 20px;
@@ -266,8 +265,13 @@ SIDEBAR
 
     a:hover {
         transform: translate(0, -2px);
-        box-shadow: 0px 7px rgba(143, 93, 54, 0.2);
+        box-shadow: 0px 5px rgba(143, 93, 54, 0.05);
+        background-color: var(--background-portion) !important;
     }
+}
+#stream {
+    margin: 0;
+    margin-top: 7px;
 }
 
 #sidebar-toggle {
@@ -277,8 +281,9 @@ SIDEBAR
 }
 
 #options {
+    margin: 0;
     position: fixed;
-    bottom: 130px;
+    bottom: 110px;
 }
 
 
@@ -292,8 +297,8 @@ BOTTOM_BAR / PLAYER
 .bottom-bar {
     position: fixed;
     bottom: 5px;
-    left: 15px;
-    right: 15px;
+    left: 5px;
+    right: 5px;
     z-index: 101;
     padding: 0;
     margin: 0;
@@ -302,15 +307,15 @@ BOTTOM_BAR / PLAYER
 .player {
         max-width: 100%;
         background: var(--background-portion);
-        height: 100px;
+        height: 85px;
         border-radius: 20px;
-        border: solid 2px rgba(255, 255, 255, 0.05);
+        border: solid 2px rgba(255, 255, 255, 0.1);
         display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
         box-shadow: 0px 5px 5px rgba(255, 255, 255, 0.05);
-        padding: 0 15px;
+        padding: 0 10px;
 
         a:hover {
             animation: hover 0.25s ease;
@@ -336,11 +341,12 @@ BOTTOM_BAR / PLAYER
 }
 
 .media-info {
-    display: flex;
+    /*display: flex;
     flex-direction: column;
+    justify-content: space-around;*/
     width: 300px;
     background-color: var(--media-background);
-    padding: 5px 20px;
+    padding: 2px 15px;
     border-radius: 23px;
     outline: 2px solid rgba(255, 255, 255, 0.02);
     box-shadow: 1px 3px 10px rgba(255, 255, 255, 0.1);
@@ -348,8 +354,6 @@ BOTTOM_BAR / PLAYER
 }
 
 #music-name {
-    font-weight: bolder;
-    width: 275px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -359,7 +363,7 @@ BOTTOM_BAR / PLAYER
 .media-status {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
 
     .slider {
@@ -384,7 +388,7 @@ BOTTOM_BAR / PLAYER
     margin-right: 5px;
 
     .slider {
-        margin-left: 10px;
+        margin-left: 0px;
     }
 }
 
@@ -411,8 +415,8 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    bottom: 125px;
-    right: 30px;
+    bottom: 100px;
+    right: 10px;
     z-index: 999;
     border-radius: 50px;
     animation: thumbnail 20s linear infinite;
@@ -428,13 +432,13 @@ h1 {
 
 .main-content {
     position: fixed;
-    left: 110px;
-    top: 10px;
-    right: 15px;
-    bottom: 115px;
+    left: 78px;
+    top: 5px;
+    right: 5px;
+    bottom: 95px;
     scrollbar-width: none;
     border-radius: 20px;
-    border: solid 2px rgba(255, 255, 255, 0.1);
+    border: solid 2px rgba(255, 255, 255, 0.2);
     background: var(--background-portion);
     overflow: auto;
     transition: left 0.25s ease;
@@ -608,21 +612,22 @@ SEARCH
 
 .query {
     background-color: rgba(255, 255, 255, 0.1);
-    height: 50px;
+    height: 35px;
     width: 50vw;
     max-width: 550px;
-    border-radius: 25px;
+    border-radius: 14px;
     border: 2px solid rgba(255, 255, 255, 0.2);
     color: var(--color);
-    box-shadow: 0px 5px rgba(255, 255, 255, 0.1);
-    padding: 0 24px;
-    font-size: 21px;
+    box-shadow: 0px 3px rgba(255, 255, 255, 0.1);
+    padding: 0 16px;
+    margin-bottom: 10px;
+    font-size: 16px;
 }
 
 #choose-music-directory {
-    height: 50px;
-    width: 50px;
-    box-shadow: 0px 5px  rgba(255, 255, 255, 0.1);
+    height: 40px;
+    width: 40px;
+    box-shadow: 0px 3px  rgba(255, 255, 255, 0.1);
     border-radius: 25px;
     margin-left: 10px;
     border: 2px solid rgba(255, 255, 255, 0.2);
@@ -846,22 +851,22 @@ STREAM
 
 #radio-search {
     background-color: rgba(255, 255, 255, 0.1);
-    height: 50px;
+    height: 35px;
     width: 500px;
-    border-radius: 25px;
+    border-radius: 14px;
     border: 2px solid rgba(255, 255, 255, 0.2);
     color: var(--color);
     box-shadow: 0px 5px rgba(255, 255, 255, 0.1);
-    padding: 0 24px;
-    font-size: 21px;
+    padding: 0 16px;
+    font-size: 16px;
 }
 
 #radio-search-btn {
-    height: 50px;
+    height: 40px;
     box-shadow: 0px 5px rgba(255, 255, 255, 0.1);
     border-radius: 25px;
     margin-left: 5px;
-    padding: 15px;
+    padding: 0 15px;
     border: 2px solid rgba(255, 255, 255, 0.2);
     background-color: rgba(255, 255, 255, 0.1);
     color: var(--color);
@@ -1066,14 +1071,14 @@ hr {
     padding: 0;
     margin: 20px 50px;
     margin-bottom: 55px;
-    border-radius: 16px;
+    border-radius: 12px;
     box-shadow: 0px 5px rgba(255, 255, 255, 0.2);
     border: solid 2px rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
     button {
-        padding: 15px;
+        padding: 10px 15px;
         background-color: transparent;
         border-color: transparent;
         border-left: solid 2px rgba(220, 220, 220, 0.2);
@@ -1186,13 +1191,15 @@ NOW PLAYING
     top: 0;
     left: 0;
     backdrop-filter: blur(50px);
-    background: radial-gradient(circle at 20% 30%, var(--color1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, var(--color2) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, var(--color3) 0%, transparent 60%),
-        radial-gradient(circle at 100% 100%, var(--color1));
-    background-size: 200% 200%;
-    animation: entry 0.25s ease, gradientShift 30s ease infinite;
-    transition: background 1.5s ease-in-out;
+    background: radial-gradient(at 10% 20%, var(--color1) 0px, transparent 50%),
+        radial-gradient(at 90% 80%, var(--color2) 0px, transparent 55%),
+        radial-gradient(at 50% 50%, var(--color3) 0px, transparent 70%),
+        radial-gradient(at 80% 10%, var(--color2) 0px, transparent 40%),
+        radial-gradient(at 0% 100%, var(--color3) 0px, transparent 40%),
+        radial-gradient(at 25% 25%, var(--color1) 0px, transparent 40%);
+    background-size: 200% 100%;
+    animation: entry 0.25s ease, gradientShift 60s ease infinite;
+    transition: background 2s ease !important;
     z-index: 102;
     display: none;
     width: 100vw;
