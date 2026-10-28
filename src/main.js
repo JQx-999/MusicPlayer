@@ -362,16 +362,20 @@ async function loadSong(index) {
         if (mprisArtUrl) {
           nowPlayImage.replaceChildren();
           const thumbImg = document.createElement("img");
+          const thumbImgBlur = document.createElement("img");
           const cleanPath = mprisArtUrl.replace(/^file:\/\//, '');
           const assetUrl = window.__TAURI__.core.convertFileSrc(cleanPath);
           thumbImg.src = assetUrl;
           thumbImg.className = "now-img";
           thumbImg.loading = 'lazy';
+          thumbImgBlur.src = assetUrl;
+          thumbImgBlur.className = "now-blur-thumb";
+          thumbImgBlur.loading = 'lazy';
           thumbImg.addEventListener("error", () => {
             thumbImg.remove();
             nowPlayImage.textContent = "🎶";
           });
-          nowPlayImage.replaceChildren(thumbImg);
+          nowPlayImage.replaceChildren(thumbImg, thumbImgBlur);
 
         } else {
           nowPlayImage.textContent = "🎶"
@@ -419,7 +423,6 @@ async function loadSong(index) {
 
     const nowPlayingArtist = document.getElementById("now-playing-artist");
     nowPlayingArtist.textContent = metadata.artist;
-
     try {
       await addRecent({
         path,
@@ -1014,6 +1017,7 @@ async function renderRecents() {
     document.querySelector(".music-thumbnail");
 
   const nowPlayingThumbnail = document.querySelector(".demo");
+  const nowPlayingBackground = document.querySelector(".now-playing-background");
 
   if (!container) return;
 
@@ -1021,28 +1025,26 @@ async function renderRecents() {
 
   container.replaceChildren();
 
-  if (nowPlayingThumbnail) {
-    nowPlayingThumbnail.replaceChildren();
+  if (nowPlayingBackground) {
+    nowPlayingBackground.replaceChildren();
     if (recents.length > 0) {
       const latestTrack = recents[0];
-      nowPlayingThumbnail.textContent = "🎶";
       try {
         const artwork = await getRecentArtwork(latestTrack.path);
         if (version !== recentsRenderVersion) return;
         if (artwork) {
           const thumbImg = document.createElement("img");
           thumbImg.src = artwork;
-          thumbImg.className = "now-img";
+          thumbImg.className = "now-playing-background-image";
 
 
 
           thumbImg.addEventListener("error", () => {
             thumbImg.remove();
-            nowPlayingThumbnail.textContent = "🎶";
           });
 
 
-          nowPlayingThumbnail.replaceChildren(thumbImg);
+          nowPlayingBackground.replaceChildren(thumbImg);
         }
       } catch (error) {
         console.warn(
@@ -2155,15 +2157,18 @@ await initializeMusicDragDrop();
 const musicThumbnailBtn = document.getElementById("music-thumbnail");
 const nowPlayingBack = document.getElementById("now-playing-back");
 const nowPlaying = document.querySelector(".now-playing");
+const nowPlayingBackground = document.querySelector(".now-playing-background");
 
 let v = 0;
 
 musicThumbnailBtn.addEventListener('click', () => {
   nowPlaying.style.setProperty('display', 'flex');
+  nowPlayingBackground.style.setProperty('display', 'block');
 });
 
 nowPlayingBack.addEventListener('click', () => {
   nowPlaying.style.setProperty('display', 'none');
+  nowPlayingBackground.style.setProperty('display', 'none');
 });
 
 const nowPlayingFullscreen = document.getElementById("now-playing-fullscreen");
@@ -2196,12 +2201,14 @@ window.addEventListener('keydown', async (event) => {
 
     await exitFullscreen();
     nowPlaying.style.setProperty('display', 'none');
+    nowPlayingBackground.style.setProperty('display', 'none');
   }
   if (event.key.toLowerCase() === 'f') {
     event.preventDefault();
 
     await toggleFullscreen();
     nowPlaying.style.setProperty('display', 'flex');
+    nowPlayingBackground.style.setProperty('display', 'block');
   }
 });
 
@@ -2214,6 +2221,20 @@ function nowPlayingArtist(newText) {
   }
 }
 
+const now = new Date();
+
+const hours = String(now.getHours()).padStart(2, '0');     // 0-23 format
+const minutes = String(now.getMinutes()).padStart(2, '0'); // 0-59 format
+const seconds = String(now.getSeconds()).padStart(2, '0'); // 0-59 format
+
+const time = document.getElementById("now-time");
+function updateTime() {
+  const now = new Date();
+  const currentTime = now.toLocaleTimeString();
+  time.textContent = currentTime;
+}
+updateTime();
+setInterval(updateTime, 1000);
 
 // ==========================================
 // OPEN WITH

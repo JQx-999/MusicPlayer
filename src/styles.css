@@ -8,13 +8,13 @@ VARIABLES
 
 
 :root {
-  --primary-color: rgba(15, 15, 15, 1);
+  --primary-color: rgba(0, 0, 0, 1);
   --color: rgba(255, 255, 255, 0.8);
   --overlay-color: rgb(0, 0, 0);
   --background-portion: rgba(255, 255, 255, 0.05);
   --sidebutton-color: rgba(0, 0, 0, 0.1);
   --button-color: rgb(50, 50, 50);
-  --filter-ico: invert(0);
+  --filter-ico: filter: invert(61%) sepia(0%) saturate(1039%) hue-rotate(141deg) brightness(92%) contrast(79%);;
   --recent-art: rgba(0, 0, 0, 0.25);
   --media-background: rgba(56, 35, 25, 0.25);
   --title-font: 45px;
@@ -71,6 +71,9 @@ input[type="search"] {
 
 body, html {
     background-color: var(--primary-color);
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
     color: var(--color);
     margin: 0;
     padding: 0;
@@ -180,7 +183,7 @@ OVERLAYS
   opacity: 0.65;
 }
 
-.overlay {
+/*.overlay {
     height: 100vh;
     width: 100vw;
     z-index: 100;
@@ -188,7 +191,7 @@ OVERLAYS
     top: 0;
     background-image: linear-gradient(0deg, var(--overlay-color) 0%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 90%, var(--overlay-color) 100%);
     pointer-events: none;
-}
+}*/
 
 .main-overlay {
     background-color: rgba(100, 100, 100, 0.2);
@@ -223,8 +226,8 @@ SIDEBAR
     bottom: 95px;
     width: 53px;
     background: var(--background-portion);
-    border-radius: 20px;
-    border: solid 2px rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    border: solid 2px rgba(255, 255, 255, 0.1);
     transition: width 0.25s ease;
 
     #home {
@@ -241,13 +244,13 @@ SIDEBAR
         align-items: center;
         overflow: hidden;
         background-color: var(--sidebutton-color);
-        border: solid 2px rgba(255, 255, 255, 0.1);
-        box-shadow: 0px 5px rgba(255, 255, 255, 0.05);
+        border: solid 2px rgba(255, 255, 255, 0.15);
+        box-shadow: 0px 5px rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(12px);
         padding: 0px 15px;
         margin-top: 7px;
         margin-bottom: 5px;
-        border-radius: 20px;
+        border-radius: 16px;
         transition: width 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
 
         img {
@@ -259,13 +262,13 @@ SIDEBAR
         p {
             display: none;
             margin-left: 15px;
-            font-weight: bolder;
+            font-weight: bold;
         }
     }
 
     a:hover {
         transform: translate(0, -2px);
-        box-shadow: 0px 5px rgba(143, 93, 54, 0.05);
+        box-shadow: 0px 5px rgba(143, 93, 54, 0.5);
         background-color: var(--background-portion) !important;
     }
 }
@@ -308,7 +311,7 @@ BOTTOM_BAR / PLAYER
         max-width: 100%;
         background: var(--background-portion);
         height: 85px;
-        border-radius: 20px;
+        border-radius: 16px;
         border: solid 2px rgba(255, 255, 255, 0.1);
         display: flex;
         flex-direction: row;
@@ -347,7 +350,7 @@ BOTTOM_BAR / PLAYER
     width: 300px;
     background-color: var(--media-background);
     padding: 2px 15px;
-    border-radius: 23px;
+    border-radius: 20px;
     outline: 2px solid rgba(255, 255, 255, 0.02);
     box-shadow: 1px 3px 10px rgba(255, 255, 255, 0.1);
     transition: margin-left 0.25s ease;
@@ -385,6 +388,7 @@ BOTTOM_BAR / PLAYER
     display: flex;
     flex-direction: row;
     align-items: center;
+    margin: 0;
     margin-right: 5px;
 
     .slider {
@@ -673,11 +677,23 @@ SEARCH
     transition: background-color 0.25s ease;
 }
 
+.library-track-title {
+    height: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .library-track-icon {
     font-size: 50px;
     background: var(--background-portion);
     border-radius: 20px;
-    padding: 10px;
+    padding: 0px;
+    height: 100px;
+    overflow: hidden;
+    img {
+        object-fit: cover;
+    }
+
 }
 
 .library-track:hover {
@@ -716,7 +732,7 @@ COLLECTIONS
         border: 2px solid rgba(255, 255, 255, 0.075);
         background-color: var(--media-background);
         padding: 12px;
-        border-radius: 15px;
+        border-radius: 16px;
         box-shadow: 0px 5px rgba(255, 255, 255, 0.1);
         color: var(--color);
         transition: background-color 0.25s ease;
@@ -782,7 +798,7 @@ COLLECTIONS
     place-items: center;
     background: var(--recent-art);
     border: 2px solid rgba(255, 255, 255, 0.05);
-    border-radius: 11px;
+    border-radius: 16px;
     font-size: 36px;
 }
 
@@ -818,6 +834,9 @@ COLLECTIONS
     display: none !important;
 }
 
+#playlist-detail-name {
+    font-size: 40px;
+}
 
 /*
 ----------------------------------------------
@@ -907,11 +926,12 @@ STREAM
     align-items: center;
     justify-content: center;
     padding: 12px;
-    border: 3px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 16px;
     background: var(--media-background);
     box-shadow: 0px 10px rgba(255, 255, 255, 0.1);
     color: var(--color);
+    height: 150px;
     font: inherit;
     text-align: left;
     cursor: pointer;
@@ -1187,6 +1207,32 @@ NOW PLAYING
 ----------------------------------------------
 */
 
+
+.now-playing-background {
+    position: fixed;
+    z-index: 101;
+    display: none;
+    width: 200vw;
+    height: 100vh;
+    background: transparent;
+    animation: now-image 2s ease, gradientShift 30s ease-in-out infinite alternate;
+}
+
+@keyframes now-image {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.now-playing-background-image {
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+}
+
 .now-playing {
     position: fixed;
     display: flex;
@@ -1194,39 +1240,42 @@ NOW PLAYING
     align-items: center;
     top: 0;
     left: 0;
-    backdrop-filter: blur(50px);
-    background: radial-gradient(at 10% 20%, var(--color1) 0px, transparent 50%),
+    backdrop-filter: blur(85px);
+    background: transparent;
+    /*background: radial-gradient(at 10% 20%, var(--color1) 0px, transparent 50%),
         radial-gradient(at 90% 80%, var(--color2) 0px, transparent 55%),
         radial-gradient(at 50% 50%, var(--color3) 0px, transparent 70%),
         radial-gradient(at 80% 10%, var(--color2) 0px, transparent 40%),
         radial-gradient(at 0% 100%, var(--color3) 0px, transparent 40%),
-        radial-gradient(at 25% 25%, var(--color1) 0px, transparent 40%);
+        radial-gradient(at 25% 25%, var(--color1) 0px, transparent 40%);*/
     background-size: 200% 100%;
-    animation: entry 0.25s ease, gradientShift 60s ease infinite;
+    animation: entry 0.25s ease;
     transition: background 2s ease !important;
     z-index: 102;
     display: none;
     width: 100vw;
     height: 100vh;
+
     button {
         cursor: pointer;
     }
+
     button:hover {
         animation: hover 0.25s ease;
         transform: translate(0, -2px);
     }
+
 }
+
 @keyframes gradientShift {
   0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
+    transform: translate(0, 0);
   }
   100% {
-    background-position: 0% 50%;
+    transform: translate(-100vw, 0);
   }
 }
+
 .now-playing-back {
     appearance: none;
     -webkit-appearance: none;
@@ -1247,6 +1296,13 @@ NOW PLAYING
         filter: var(--filter-ico);
     }
 }
+
+.now-time {
+    position: fixed;
+    top: 5vh;
+    font-weight: bolder;
+}
+
 .now-playing-main {
     width: 90vw;
     max-width: 1000px;
@@ -1280,9 +1336,22 @@ NOW PLAYING
         object-fit: cover;
     }
 }
+
 .now-playing-image:hover {
     animation: hover 0.25s ease;
     transform: translate(0, -2px);
+}
+
+.now-blur-thumb {
+    position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: blur(12px);
+      transform: scale(1.05);
+      -webkit-mask-image: radial-gradient(ellipse at center, transparent 40%, #000 50%);
+                mask-image: radial-gradient(ellipse at center, transparent 40%, #000 80%);
 }
 .now-playing-details {
     display: flex;

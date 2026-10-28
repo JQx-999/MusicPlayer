@@ -1,7 +1,7 @@
-
 const invoke = window.__TAURI__.core.invoke;
 
-const FOLDER_KEY = "resonance_music_directory";
+const FOLDER_KEY = "music_directory";
+
 
 let onTrackSelected = null;
 let searchTimer = null;
@@ -14,8 +14,7 @@ function setStatus(message) {
   const status = $("#library-status");
   if (status) status.textContent = message;
 }
-
-function renderResults(tracks) {
+async function renderResults(tracks) {
   const container = $("#library-results");
   if (!container) return;
 
@@ -38,12 +37,13 @@ function renderResults(tracks) {
     title.className = "library-track-title";
     title.textContent = track.title;
 
-    const icon = document.createElement("span");
+    const icon = document.createElement("div");
     icon.className = "library-track-icon";
-    icon.textContent = "♫";
+    icon.innerText = "🎝";
 
     button.append(title, icon);
     button.title = track.path;
+
 
     button.addEventListener("click", () => {
       if (onTrackSelected) {

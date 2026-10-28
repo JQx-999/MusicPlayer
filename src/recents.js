@@ -1,8 +1,8 @@
 
-const STORAGE_KEY = "resonance_recently_played";
+const STORAGE_KEY = "recently_played";
 const MAX_RECENTS = 12;
 
-const DB_NAME = "resonance_artwork";
+const DB_NAME = "artwork";
 const STORE_NAME = "covers";
 const DB_VERSION = 1;
 
