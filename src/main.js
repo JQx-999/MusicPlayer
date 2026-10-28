@@ -523,6 +523,12 @@ nowPlayBtn?.addEventListener("click", togglePlayback);
 // KEYBOARD SHORTCUTS
 // --------------------------------------------------
 
+
+window.addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+});
+
+
 window.addEventListener("keydown", event => {
   const target = event.target;
   if (

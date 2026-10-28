@@ -19,9 +19,9 @@ VARIABLES
   --media-background: rgba(56, 35, 25, 0.25);
   --title-font: 45px;
   --font-family: system-ui, sans-serif;
-  --color1: rgba(10, 10, 10, 0.25);
-  --color2: rgba(10, 10, 10, 0.5);
-  --color3: rgba(10, 10, 10, 0.75);
+  --color1: rgba(255, 177, 10, 0.25);
+  --color2: rgba(100, 10, 00, 0.5);
+  --color3: rgba(120, 10, 10, 0.75);
   --hover-background: rgba(56, 35, 25, 0.5);
 }
 
