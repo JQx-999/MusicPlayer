@@ -1043,8 +1043,8 @@ async function renderRecents() {
             thumbImg.remove();
           });
 
-
           nowPlayingBackground.replaceChildren(thumbImg);
+
         }
       } catch (error) {
         console.warn(
