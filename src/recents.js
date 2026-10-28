@@ -299,9 +299,6 @@ export async function addRecent(track) {
   if (track.artwork) {
     try {
       const cachedArtwork = await readArtwork(track.path);
-      console.log(track.path);
-      console.log(track.artwork);
-      console.log(track.blob);
 
       if (!cachedArtwork) {
         const blob = await optimizeArtwork(track.artwork);

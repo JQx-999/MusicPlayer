@@ -550,6 +550,72 @@ window.addEventListener("keydown", event => {
   }
 });
 
+window.addEventListener("keydown", async (event) => {
+  if (currentStation) return;
+  const validKeys = ["ArrowRight", "ArrowLeft"];
+  if (!validKeys.includes(event.key)) return;
+  event.preventDefault();
+  seeking = true;
+  const stepAmount = 5;
+  const currentVal = Number(progressSlider.value);
+  const maxVal = Number(progressSlider.max || 100);
+  const minVal = Number(progressSlider.min || 0);
+  let targetVal = currentVal;
+  if (event.key === "ArrowRight") {
+    targetVal = Math.min(maxVal, currentVal + stepAmount);
+  } else if (event.key === "ArrowLeft") {
+    targetVal = Math.max(minVal, currentVal - stepAmount);
+  }
+  progressSlider.value = targetVal;
+  if (currentTime) {
+    currentTime.textContent = formatTime(targetVal);
+  }
+  try {
+    await invoke("seek_track", { seconds: targetVal });
+    await updatePlayerUI();
+  } catch (error) {
+    console.error("Seeking via keyboard failed:", error);
+  } finally {
+    seeking = false;
+  }
+});
+
+window.addEventListener("keydown", async (event) => {
+  if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+  if (!volumeSlider) return;
+
+  const tag = document.activeElement?.tagName;
+  if (tag === "TEXTAREA" || (tag === "INPUT" && document.activeElement !== volumeSlider)) return;
+
+  event.preventDefault();
+
+  const step = 5;
+  const delta = event.key === "ArrowUp" ? step : -step;
+  const next = Math.min(100, Math.max(0, Number(volumeSlider.value) + delta));
+
+  volumeSlider.value = next;
+  nowVolumeSlider.value = next;
+  const volume = next / 100;
+
+  try {
+    await invoke("set_player_volume", { volume });
+
+    if (volume > 0) {
+      lastVolume = volume;
+      isMuted = false;
+
+      muteBtn?.classList.remove("is-muted");
+      nowMuteBtn?.classList.remove("is-muted");
+
+      if (audioImg) {
+        audioImg.src = "assets/xsi-audio-volume-high-symbolic.svg";
+      }
+    }
+  } catch (error) {
+    console.error("[musicplayer] Volume error:", error);
+  }
+});
+
 // --------------------------------------------------
 // VOLUME
 // --------------------------------------------------
