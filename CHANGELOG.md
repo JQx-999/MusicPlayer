@@ -50,3 +50,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed the UI with a card layout rather than a list layout in Search and Stream section.
 - Optimized the UI to make it more interactive.
 - Fixed Bugs.
+
+## [1.0.2] -2026-10-22
+
+### Added
+- Added Buffered music p;aying.
+- Added Added Buffered music playing.
+- Added Gapless playback in collections/playlists.
+- Redesigned the now-playing fullscreen.
+- Added more key shortcuts.
+
+### Fixed
+- Optimized UI.
+- Optimized UI for even smaller windows.
+- Bug fixes. 
