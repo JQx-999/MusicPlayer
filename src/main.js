@@ -7,7 +7,6 @@ import {
 } from "./recents.js";
 
 
-
 import { initRadio } from "./radio.js";
 import { initCollections } from "./collections.js";
 import { initMusicSearch } from "./search.js";
@@ -232,6 +231,193 @@ setInterval(async () => {
   }
 }, 250);
 
+
+
+// --------------------------------------------------
+// REFRESH SONG
+// --------------------------------------------------
+
+async function refreshTrackMetadata(path) {
+  const filename = path.split(/[\\/]/).pop();
+  const fallbackTitle = filename.replace(/\.[^.]+$/, "");
+
+  let metadata = {
+    title: fallbackTitle,
+    artist: "Unknown Artist",
+    album: "Unknown Album"
+  };
+
+  let artwork = null;
+
+  const [artResult, metadataResult] = await Promise.allSettled([
+    invoke("get_album_art", { path }),
+    invoke("get_track_metadata", { path })
+  ]);
+
+  if (artResult.status === "fulfilled") {
+    artwork = artResult.value;
+  } else {
+    console.warn("[musicplayer] Artwork extraction failed:", artResult.reason);
+  }
+
+  if (metadataResult.status === "fulfilled") {
+    const extracted = metadataResult.value;
+    const validText = value =>
+      typeof value === "string" && value.trim().length > 0;
+
+    metadata = {
+      title: validText(extracted?.title)
+        ? extracted.title.trim()
+        : fallbackTitle,
+      artist: validText(extracted?.artist)
+        ? extracted.artist.trim()
+        : "Unknown Artist",
+      album: validText(extracted?.album)
+        ? extracted.album.trim()
+        : "Unknown Album"
+    };
+  } else {
+    console.warn(
+      "[musicplayer] Metadata extraction failed:",
+      metadataResult.reason
+    );
+  }
+
+  const nameElement = document.querySelector("#music-name");
+  const nowNameElement = document.querySelector("#now-playing-name");
+  const nowPlayingArtist = document.getElementById("now-playing-artist");
+
+  if (nameElement) nameElement.textContent = metadata.title;
+  if (nowNameElement) nowNameElement.textContent = metadata.title;
+  if (nowPlayingArtist) nowPlayingArtist.textContent = metadata.artist;
+
+  const nowPlayImage = document.getElementById("now-playing-image");
+  let mprisArtUrl = null;
+
+  if (nowPlayImage) {
+    nowPlayImage.replaceChildren();
+    nowPlayImage.textContent = "🎶";
+  }
+
+  if (
+    typeof artwork === "string" &&
+    artwork.startsWith("data:image/")
+  ) {
+    try {
+      mprisArtUrl = await invoke("cache_mpris_artwork", {
+        imageData: artwork
+      });
+
+      if (nowPlayImage && mprisArtUrl) {
+        nowPlayImage.replaceChildren();
+
+        const cleanPath = mprisArtUrl.replace(/^file:\/\//, "");
+        const assetUrl = window.__TAURI__.core.convertFileSrc(cleanPath);
+
+        const img = document.createElement("img");
+        const blur = document.createElement("img");
+
+        img.src = assetUrl;
+        img.className = "now-img";
+        img.loading = "lazy";
+
+        blur.src = assetUrl;
+        blur.className = "now-blur-thumb";
+        blur.loading = "lazy";
+
+        img.addEventListener("error", () => {
+          nowPlayImage.replaceChildren();
+          nowPlayImage.textContent = "🎶";
+        });
+
+        nowPlayImage.replaceChildren(img, blur);
+      }
+    } catch (error) {
+      console.warn("[MPRIS] Could not cache album artwork:", error);
+    }
+  }
+
+  try {
+    const state = await invoke("get_player_state");
+
+    await invoke("update_mpris_metadata", {
+      metadata: {
+        title: metadata.title,
+        artist: metadata.artist,
+        album: metadata.album,
+        artUrl: mprisArtUrl,
+        duration: state.duration || 0
+      }
+    });
+
+    await invoke("update_mpris_status", { status: "playing" });
+  } catch (error) {
+    console.warn("[MPRIS] Metadata update failed:", error);
+  }
+
+  try {
+    await addRecent({
+      path,
+      title: metadata.title,
+      artist: metadata.artist,
+      album: metadata.album,
+      artwork
+    });
+
+    await renderRecents();
+  } catch (error) {
+    console.warn("[musicplayer] Could not update Recents:", error);
+  }
+
+  console.log("[musicplayer] Refreshed gapless track:", metadata);
+}
+
+let lastGaplessPath = null;
+let gaplessCheckRunning = false;
+
+async function checkGaplessTrack() {
+  if (gaplessCheckRunning) return;
+
+  gaplessCheckRunning = true;
+
+  try {
+    const state = await invoke("get_player_state");
+    const path = state.current_path;
+
+    if (typeof path !== "string" || !path) return;
+
+    if (lastGaplessPath === null) {
+      lastGaplessPath = playlist[currentTrackIndex] || path;
+    }
+
+    if (path === lastGaplessPath) return;
+
+    lastGaplessPath = path;
+
+    const index = playlist.findIndex(item => item === path);
+
+    if (index !== -1) {
+      currentTrackIndex = index;
+    }
+
+    trackLoaded = true;
+    previousPlaybackStatus = "playing";
+
+    await refreshTrackMetadata(path);
+
+    if (index !== -1 && index < playlist.length - 1) {
+      await invoke("gapless_queue", {
+        path: playlist[index + 1]
+      });
+    }
+  } catch (error) {
+    console.warn("[musicplayer] Gapless track check failed:", error);
+  } finally {
+    gaplessCheckRunning = false;
+  }
+}
+setInterval(checkGaplessTrack, 300);
+
 // --------------------------------------------------
 // LOAD SONG
 // --------------------------------------------------
@@ -250,6 +436,8 @@ async function loadSong(index) {
 
   const path = playlist[index];
 
+
+  console.log(playlist[index]);
   try {
     if (currentStation) {
       await invoke("stop_radio");
@@ -262,7 +450,10 @@ async function loadSong(index) {
     }
 
     await invoke("load_track", { path });
-
+    if (index < (playlist.length-1)) {
+      const path1 = playlist[index + 1];
+      await invoke("gapless_queue", { path: path1 });
+    }
     currentTrackIndex = index;
     trackLoaded = true;
 
@@ -876,6 +1067,22 @@ document
       (currentTrackIndex + 1) % playlist.length;
 
     await loadSong(next);
+  });
+document
+  .querySelector("#prev-btn")
+  ?.addEventListener("click", async () => {
+    if (
+      playlist.length === 0 ||
+      playbackTransitioning
+    ) {
+      return;
+    }
+
+    const previous =
+      (currentTrackIndex - 1 + playlist.length) %
+      playlist.length;
+
+    await loadSong(previous);
   });
 
 document
@@ -1988,7 +2195,7 @@ await listen("musicplayer://mpris-next", async () => {
 
 await listen("musicplayer://mpris-previous", async () => {
 
-  document.querySelector("#previous-btn")?.click();
+  document.querySelector("#prev-btn")?.click();
 });
 
 // --------------------------------------------------

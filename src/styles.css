@@ -1411,9 +1411,6 @@ NOW PLAYING
     margin-right: 0;
 }
 
-#now-volume {
-    margin-top: 15px;
-}
 #now-mute-btn {
     img {
         width: 27px;

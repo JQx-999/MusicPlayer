@@ -1,6 +1,5 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 use audio::player::{AudioPlayer, PlayerState};
-
 mod audio;
 mod library;
 mod mpris;
@@ -137,11 +136,9 @@ fn play_track(player: tauri::State<'_, std::sync::Arc<AudioPlayer>>) -> Result<(
 fn greet(name: &str) -> String {
     format!("Hello, {}!", name)
 }
+// Example inside your Tauri command definitions
 #[tauri::command]
-fn seek_track(
-    player: tauri::State<'_, std::sync::Arc<AudioPlayer>>,
-    seconds: f64,
-) -> Result<(), String> {
+fn seek_track(seconds: f64, player: tauri::State<'_, Arc<AudioPlayer>>) -> Result<(), String> {
     player.seek(seconds)
 }
 #[tauri::command]
@@ -197,6 +194,18 @@ async fn test_decode(path: String) -> Result<audio::decoder::DecodeInfo, String>
 #[tauri::command]
 fn get_track_info(path: String) -> Result<audio::decoder::TrackInfo, String> {
     audio::decoder::read_track(&path)
+}
+
+#[tauri::command]
+async fn gapless_queue(
+    player: tauri::State<'_, std::sync::Arc<audio::player::AudioPlayer>>,
+    path: String,
+) -> Result<(), String> {
+    let player = player.inner().clone();
+
+    tauri::async_runtime::spawn_blocking(move || player.gapless_queue(&path))
+        .await
+        .map_err(|e| e.to_string())?
 }
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -262,6 +271,7 @@ pub fn run() {
             start_radio,
             stop_radio,
             get_radio_state,
+            gapless_queue,
             create_playlist,
             add_playlist_track,
             remove_playlist_track,
@@ -271,9 +281,11 @@ pub fn run() {
             mpris::update_mpris_metadata,
             #[cfg(target_os = "linux")]
             mpris::update_mpris_status,
-            mpris::update_mpris_metadata,
+            #[cfg(target_os = "linux")]
             mpris::update_mpris_status,
+            #[cfg(target_os = "linux")]
             mpris::cache_mpris_artwork,
+            #[cfg(target_os = "linux")]
             open_with::take_open_with_files
         ])
         .run(tauri::generate_context!())

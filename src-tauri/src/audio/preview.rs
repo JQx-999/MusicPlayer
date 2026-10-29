@@ -1,10 +1,17 @@
+use std::sync::atomic::{AtomicBool, Ordering::SeqCst};
+use std::sync::{Arc, mpsc};
+use std::thread::{self, JoinHandle};
+use std::time::{Duration, Instant};
+
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
-use cpal::{SampleFormat, StreamConfig};
+use cpal::{FromSample, SampleFormat, SizedSample, Stream, StreamConfig};
+use ffmpeg::frame::Audio as AudioFrame;
+use ffmpeg::software::resampling::Context as Resampler;
 use ffmpeg_next as ffmpeg;
+use ringbuf::traits::{Consumer, Observer, Producer, Split};
+use ringbuf::{HeapCons, HeapProd, HeapRb};
 
-use std::sync::Arc;
-use std::time::Duration;
-
+#[allow(dead_code)]
 pub(crate) fn decode_preview(path: &str, output_rate: u32) -> Result<Vec<f32>, String> {
     if output_rate == 0 {
         return Err("Invalid output sample rate".into());
@@ -116,113 +123,420 @@ pub(crate) fn decode_preview(path: &str, output_rate: u32) -> Result<Vec<f32>, S
 
     Ok(pcm)
 }
+
 pub fn play_preview(path: &str) -> Result<String, String> {
-    let host = cpal::default_host();
+    const PREVIEW_SECS: f32 = 5.0;
 
-    let device = host
-        .default_output_device()
-        .ok_or("No audio output device found")?;
+    let handle = start_preview(path, Some(PREVIEW_SECS))?;
 
-    let supported = device.default_output_config().map_err(|e| e.to_string())?;
-
-    let sample_format = supported.sample_format();
-    let config: StreamConfig = supported.into();
-
-    let pcm = Arc::new(decode_preview(path, config.sample_rate)?);
-
-    let channels = config.channels as usize;
-
-    if channels == 0 {
-        return Err("Audio device reported zero channels".into());
+    let deadline = Instant::now() + Duration::from_secs_f32(PREVIEW_SECS + 5.0);
+    while !handle.is_finished() && Instant::now() < deadline {
+        thread::sleep(Duration::from_millis(20));
     }
-    fn sample_at(pcm: &[f32], output_position: usize, channels: usize) -> f32 {
-        let frame_index = output_position / channels;
-        let channel = output_position % channels;
 
-        let left = pcm.get(frame_index * 2).copied().unwrap_or(0.0);
+    drop(handle);
+    Ok("Native music preview completed!".into())
+}
 
-        let right = pcm.get(frame_index * 2 + 1).copied().unwrap_or(0.0);
+const RING_SECONDS: usize = 2;
+const VOLUME: f32 = 0.65;
 
-        let sample = if channels == 1 {
-            (left + right) * 0.5
-        } else if channel == 0 {
-            left
-        } else if channel == 1 {
-            right
-        } else {
-            0.0
+#[derive(Default)]
+struct Shared {
+    stop: AtomicBool,
+    paused: AtomicBool,
+    decoder_done: AtomicBool,
+    finished: AtomicBool,
+}
+
+pub struct PreviewHandle {
+    shared: Arc<Shared>,
+    audio_thread: Option<JoinHandle<()>>,
+}
+
+impl PreviewHandle {
+    #[allow(dead_code)]
+    pub fn set_paused(&self, paused: bool) {
+        self.shared.paused.store(paused, SeqCst);
+    }
+    pub fn is_finished(&self) -> bool {
+        self.shared.finished.load(SeqCst)
+    }
+    pub fn stop(&mut self) {
+        self.shared.stop.store(true, SeqCst);
+        if let Some(t) = self.audio_thread.take() {
+            let _ = t.join();
+        }
+    }
+}
+
+impl Drop for PreviewHandle {
+    fn drop(&mut self) {
+        self.stop();
+    }
+}
+
+pub fn start_preview(path: &str, max_seconds: Option<f32>) -> Result<PreviewHandle, String> {
+    let shared = Arc::new(Shared::default());
+
+    let (dev_tx, dev_rx) = mpsc::sync_channel::<Result<(u32, HeapProd<f32>), String>>(1);
+    let audio_shared = shared.clone();
+    let audio_thread = thread::Builder::new()
+        .name("audio-output".into())
+        .spawn(move || audio_thread_main(audio_shared, dev_tx))
+        .map_err(|e| e.to_string())?;
+
+    let handle = PreviewHandle {
+        shared: shared.clone(),
+        audio_thread: Some(audio_thread),
+    };
+
+    let (rate, prod) = dev_rx
+        .recv()
+        .map_err(|_| "Audio thread exited unexpectedly".to_string())??;
+
+    let (ready_tx, ready_rx) = mpsc::sync_channel::<Result<(), String>>(1);
+    let dec_shared = shared.clone();
+    let path = path.to_owned();
+    let max_samples = max_seconds.map(|s| (s.max(0.0) * rate as f32) as usize * 2);
+
+    thread::Builder::new()
+        .name("audio-decoder".into())
+        .spawn(move || {
+            match DecoderState::open(&path, rate) {
+                Ok(mut dec) => {
+                    let _ = ready_tx.send(Ok(()));
+                    let mut sink = Sink {
+                        prod,
+                        shared: &dec_shared,
+                        remaining: max_samples,
+                    };
+                    if let Err(e) = dec.run(&mut sink) {
+                        eprintln!("Decoder error: {e}");
+                    }
+                }
+                Err(e) => {
+                    let _ = ready_tx.send(Err(e));
+                }
+            }
+            dec_shared.decoder_done.store(true, SeqCst);
+        })
+        .map_err(|e| e.to_string())?;
+
+    ready_rx
+        .recv()
+        .map_err(|_| "Decoder thread exited unexpectedly".to_string())??;
+
+    Ok(handle)
+}
+
+fn audio_thread_main(
+    shared: Arc<Shared>,
+    dev_tx: mpsc::SyncSender<Result<(u32, HeapProd<f32>), String>>,
+) {
+    let setup = || -> Result<(Stream, u32, HeapProd<f32>), String> {
+        let host = cpal::default_host();
+        let device = host
+            .default_output_device()
+            .ok_or("No audio output device found")?;
+        let supported = device.default_output_config().map_err(|e| e.to_string())?;
+        let sample_format = supported.sample_format();
+        let config: StreamConfig = supported.into();
+
+        let rate = config.sample_rate;
+        let channels = config.channels as usize;
+        if channels == 0 || rate == 0 {
+            return Err("Audio device reported invalid configuration".into());
+        }
+
+        let rb = HeapRb::<f32>::new(rate as usize * 2 * RING_SECONDS);
+        let (prod, cons) = rb.split();
+        let prebuffer = rate as usize;
+
+        let sh = shared.clone();
+        let stream = match sample_format {
+            SampleFormat::F32 => {
+                build_stream::<f32>(&device, config, channels, cons, sh, prebuffer)
+            }
+            SampleFormat::I16 => {
+                build_stream::<i16>(&device, config, channels, cons, sh, prebuffer)
+            }
+            SampleFormat::U16 => {
+                build_stream::<u16>(&device, config, channels, cons, sh, prebuffer)
+            }
+            SampleFormat::I32 => {
+                build_stream::<i32>(&device, config, channels, cons, sh, prebuffer)
+            }
+            other => return Err(format!("Unsupported output sample format: {other:?}")),
+        }
+        .map_err(|e| e.to_string())?;
+
+        stream.play().map_err(|e| e.to_string())?;
+        Ok((stream, rate, prod))
+    };
+
+    match setup() {
+        Ok((stream, rate, prod)) => {
+            let _ = dev_tx.send(Ok((rate, prod)));
+            while !shared.stop.load(SeqCst) && !shared.finished.load(SeqCst) {
+                thread::sleep(Duration::from_millis(20));
+            }
+            if shared.finished.load(SeqCst) && !shared.stop.load(SeqCst) {
+                thread::sleep(Duration::from_millis(300));
+            }
+            drop(stream);
+        }
+        Err(e) => {
+            let _ = dev_tx.send(Err(e));
+        }
+    }
+    shared.finished.store(true, SeqCst);
+}
+fn build_stream<T>(
+    device: &cpal::Device,
+    config: StreamConfig,
+    channels: usize,
+    mut cons: HeapCons<f32>,
+    shared: Arc<Shared>,
+    prebuffer: usize,
+) -> Result<Stream, String>
+where
+    T: SizedSample + FromSample<f32>,
+{
+    let mut started = false;
+
+    device
+        .build_output_stream(
+            config,
+            move |data: &mut [T], _| {
+                let silence = T::from_sample(0.0f32);
+
+                if shared.paused.load(SeqCst) {
+                    data.fill(silence);
+                    return;
+                }
+
+                let done = shared.decoder_done.load(SeqCst);
+
+                if !started {
+                    if cons.occupied_len() >= prebuffer || done {
+                        started = true;
+                    } else {
+                        data.fill(silence);
+                        return;
+                    }
+                }
+
+                for frame in data.chunks_mut(channels) {
+                    let (l, r) = if cons.occupied_len() >= 2 {
+                        (cons.try_pop().unwrap_or(0.0), cons.try_pop().unwrap_or(0.0))
+                    } else {
+                        if done {
+                            shared.finished.store(true, SeqCst);
+                        }
+                        (0.0, 0.0)
+                    };
+
+                    for (i, out) in frame.iter_mut().enumerate() {
+                        let s = if channels == 1 {
+                            (l + r) * 0.5
+                        } else {
+                            match i {
+                                0 => l,
+                                1 => r,
+                                _ => 0.0,
+                            }
+                        };
+                        *out = T::from_sample((s * VOLUME).clamp(-1.0, 1.0));
+                    }
+                }
+            },
+            |e| eprintln!("CPAL error: {e}"),
+            None,
+        )
+        .map_err(|e| e.to_string())
+}
+
+struct Sink<'a> {
+    prod: HeapProd<f32>,
+    shared: &'a Shared,
+    remaining: Option<usize>,
+}
+
+impl Sink<'_> {
+    fn write(&mut self, mut data: &[f32]) -> bool {
+        let mut limit_hit = false;
+        if let Some(rem) = self.remaining {
+            if data.len() >= rem {
+                data = &data[..rem];
+                limit_hit = true;
+            }
+            self.remaining = Some(rem - data.len());
+        }
+        while !data.is_empty() {
+            if self.shared.stop.load(SeqCst) {
+                return false;
+            }
+            let n = self.prod.push_slice(data);
+            data = &data[n..];
+            if n == 0 {
+                thread::sleep(Duration::from_millis(5));
+            }
+        }
+        !limit_hit
+    }
+}
+
+struct DecoderState {
+    input: ffmpeg::format::context::Input,
+    decoder: ffmpeg::decoder::Audio,
+    resampler: Resampler,
+    stream_index: usize,
+    in_rate: u32,
+    out_rate: u32,
+}
+
+fn packed_stereo(samples: usize) -> AudioFrame {
+    AudioFrame::new(
+        ffmpeg::format::Sample::F32(ffmpeg::format::sample::Type::Packed),
+        samples,
+        ffmpeg::channel_layout::ChannelLayout::STEREO,
+    )
+}
+
+fn frame_to_f32(frame: &AudioFrame, out: &mut Vec<f32>) {
+    let bytes = frame.data(0);
+    let len = (frame.samples() * 2 * 4).min(bytes.len());
+    out.clear();
+    out.extend(
+        bytes[..len]
+            .chunks_exact(4)
+            .map(|b| f32::from_ne_bytes([b[0], b[1], b[2], b[3]])),
+    );
+}
+
+impl DecoderState {
+    fn open(path: &str, out_rate: u32) -> Result<Self, String> {
+        ffmpeg::init().map_err(|e| e.to_string())?;
+        let input = ffmpeg::format::input(path).map_err(|e| e.to_string())?;
+
+        let (stream_index, decoder) = {
+            let stream = input
+                .streams()
+                .best(ffmpeg::media::Type::Audio)
+                .ok_or("No audio stream found")?;
+            let ctx = ffmpeg::codec::context::Context::from_parameters(stream.parameters())
+                .map_err(|e| e.to_string())?;
+            (
+                stream.index(),
+                ctx.decoder().audio().map_err(|e| e.to_string())?,
+            )
         };
 
-        sample * 0.65
+        let in_rate = decoder.rate();
+        let resampler = Resampler::get(
+            decoder.format(),
+            decoder.channel_layout(),
+            in_rate,
+            ffmpeg::format::Sample::F32(ffmpeg::format::sample::Type::Packed),
+            ffmpeg::channel_layout::ChannelLayout::STEREO,
+            out_rate,
+        )
+        .map_err(|e| e.to_string())?;
+
+        Ok(Self {
+            input,
+            decoder,
+            resampler,
+            stream_index,
+            in_rate,
+            out_rate,
+        })
     }
 
-    let stream = match sample_format {
-        SampleFormat::F32 => {
-            let pcm = Arc::clone(&pcm);
-            let mut position = 0_usize;
+    fn convert_and_push(
+        resampler: &mut Resampler,
+        decoded: &AudioFrame,
+        in_rate: u32,
+        out_rate: u32,
+        scratch: &mut Vec<f32>,
+        sink: &mut Sink,
+    ) -> Result<bool, String> {
+        let capacity = ((decoded.samples() as u64 * out_rate as u64 + in_rate as u64 - 1)
+            / in_rate as u64) as usize
+            + 256;
+        let mut converted = packed_stereo(capacity);
+        converted.set_rate(out_rate);
 
-            device.build_output_stream(
-                config.clone(),
-                move |data: &mut [f32], _| {
-                    for output in data {
-                        *output = sample_at(&pcm, position, channels).clamp(-1.0, 1.0);
+        resampler
+            .run(decoded, &mut converted)
+            .map_err(|e| e.to_string())?;
 
-                        position += 1;
-                    }
-                },
-                |error| eprintln!("CPAL error: {error}"),
-                None,
-            )
+        if converted.samples() == 0 {
+            return Ok(true);
         }
-
-        SampleFormat::I16 => {
-            let pcm = Arc::clone(&pcm);
-            let mut position = 0_usize;
-
-            device.build_output_stream(
-                config.clone(),
-                move |data: &mut [i16], _| {
-                    for output in data {
-                        let sample = sample_at(&pcm, position, channels).clamp(-1.0, 1.0);
-
-                        *output = (sample * i16::MAX as f32) as i16;
-
-                        position += 1;
-                    }
-                },
-                |error| eprintln!("CPAL error: {error}"),
-                None,
-            )
-        }
-
-        SampleFormat::U16 => {
-            let pcm = Arc::clone(&pcm);
-            let mut position = 0_usize;
-
-            device.build_output_stream(
-                config.clone(),
-                move |data: &mut [u16], _| {
-                    for output in data {
-                        let sample = sample_at(&pcm, position, channels).clamp(-1.0, 1.0);
-
-                        *output = ((sample + 1.0) * 0.5 * u16::MAX as f32) as u16;
-
-                        position += 1;
-                    }
-                },
-                |error| eprintln!("CPAL error: {error}"),
-                None,
-            )
-        }
-
-        other => {
-            return Err(format!("Unsupported output sample format: {other:?}"));
-        }
+        frame_to_f32(&converted, scratch);
+        Ok(sink.write(scratch))
     }
-    .map_err(|e| e.to_string())?;
 
-    stream.play().map_err(|e| e.to_string())?;
-    std::thread::sleep(Duration::from_secs(5));
+    fn run(&mut self, sink: &mut Sink) -> Result<(), String> {
+        let Self {
+            input,
+            decoder,
+            resampler,
+            stream_index,
+            in_rate,
+            out_rate,
+        } = self;
+        let (in_rate, out_rate, stream_index) = (*in_rate, *out_rate, *stream_index);
 
-    Ok("Native music preview completed!".into())
+        let mut decoded = AudioFrame::empty();
+        let mut scratch: Vec<f32> = Vec::new();
+
+        for (stream, packet) in input.packets() {
+            if sink.shared.stop.load(SeqCst) {
+                return Ok(());
+            }
+            if stream.index() != stream_index {
+                continue;
+            }
+            if decoder.send_packet(&packet).is_err() {
+                continue;
+            }
+            while decoder.receive_frame(&mut decoded).is_ok() {
+                if !Self::convert_and_push(
+                    resampler,
+                    &decoded,
+                    in_rate,
+                    out_rate,
+                    &mut scratch,
+                    sink,
+                )? {
+                    return Ok(());
+                }
+            }
+        }
+
+        let _ = decoder.send_eof();
+        while decoder.receive_frame(&mut decoded).is_ok() {
+            if !Self::convert_and_push(resampler, &decoded, in_rate, out_rate, &mut scratch, sink)?
+            {
+                return Ok(());
+            }
+        }
+
+        loop {
+            let mut tail = packed_stereo(4096);
+            tail.set_rate(out_rate);
+            resampler.flush(&mut tail).map_err(|e| e.to_string())?;
+            if tail.samples() == 0 {
+                break;
+            }
+            frame_to_f32(&tail, &mut scratch);
+            if !sink.write(&scratch) {
+                break;
+            }
+        }
+        Ok(())
+    }
 }
