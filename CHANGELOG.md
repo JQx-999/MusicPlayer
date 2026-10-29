@@ -51,11 +51,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Optimized the UI to make it more interactive.
 - Fixed Bugs.
 
-## [1.0.2] -2026-10-22
+## [1.0.3] -2026-10-29
 
 ### Added
-- Added Buffered music p;aying.
-- Added Added Buffered music playing.
+- Added Buffered music playing.
 - Added Gapless playback in collections/playlists.
 - Redesigned the now-playing fullscreen.
 - Added more key shortcuts.
