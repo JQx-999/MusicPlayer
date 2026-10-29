@@ -1,6 +1,6 @@
 
 const STORAGE_KEY = "recently_played";
-const MAX_RECENTS = 12;
+const MAX_RECENTS = 25;
 
 const DB_NAME = "artwork";
 const STORE_NAME = "covers";

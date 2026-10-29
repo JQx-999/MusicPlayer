@@ -22,11 +22,13 @@ VARIABLES
   --color1: rgba(255, 177, 10, 0.25);
   --color2: rgba(100, 10, 00, 0.5);
   --color3: rgba(120, 10, 10, 0.75);
+  --now-color: rgba(0, 0, 0, 0.1);
   --hover-background: rgba(56, 35, 25, 0.5);
 }
 
 .light-theme {
     --primary-color: rgba(180, 180, 190, 1);
+    --now-color: rgba(255, 255, 255, 0.1);
     --color: rgba(0, 0, 0, 0.8);
     --overlay-color: rgba(255, 255, 255, 0.5);
     --background-portion: rgba(220, 220, 220, 0.2);
@@ -1245,7 +1247,7 @@ NOW PLAYING
     top: 0;
     left: 0;
     backdrop-filter: blur(85px);
-    background: transparent;
+    background: var(--now-color);
     /*background: radial-gradient(at 10% 20%, var(--color1) 0px, transparent 50%),
         radial-gradient(at 90% 80%, var(--color2) 0px, transparent 55%),
         radial-gradient(at 50% 50%, var(--color3) 0px, transparent 70%),
@@ -1308,8 +1310,8 @@ NOW PLAYING
 }
 
 .now-playing-main {
-    width: 90vw;
-    max-width: 1000px;
+    width: 100vw;
+    max-width: 1400px;
     height: 60vh;
     background-color: transparent;
     display: flex;
@@ -1318,11 +1320,18 @@ NOW PLAYING
     align-items: center;
 
 }
+.now-1 {
+    width: 50vw;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
 .now-playing-image {
-    height: 50vh;
-    max-height: 350px;
-    max-width: 350px;
-    width: 50vh;
+    height: 60vh;
+    max-height: 450px;
+    max-width: 450px;
+    width: 60vh;
     background-color: var(--media-background);
     box-shadow: 0px 1px rgba(255, 255, 255, 0.25);
     border: 1px solid var(--recent-art);
@@ -1360,7 +1369,6 @@ NOW PLAYING
 .now-playing-details {
     display: flex;
     justify-content: center;
-    align-items: center;
     flex-direction: column;
     margin-left: 25px;
 }
@@ -1369,7 +1377,7 @@ NOW PLAYING
     font-size: 50px;
     max-width: 500px;
     max-height: 250px;
-    text-align: center;
+    text-align: left;
     text-overflow: ellipsis;
     margin-bottom: 5px;
     color: var(--color);
@@ -1379,8 +1387,8 @@ NOW PLAYING
 }
 
 #now-playing-artist {
-    margin-bottom: 25px;
-    text-align: center;
+    margin-bottom: 5px;
+    text-align: left;
     max-width: 500px;
     opacity: 0.75;
 }
@@ -1403,10 +1411,9 @@ NOW PLAYING
     margin-right: 0;
 }
 
-#now-progress-slider {
-    height: 100px;
+#now-volume {
+    margin-top: 15px;
 }
-
 #now-mute-btn {
     img {
         width: 27px;
@@ -1421,9 +1428,7 @@ NOW PLAYING
     }
 }
 
-#now-media-status {
-    width: 300px;
-}
+
 
 #now-playing-fullscreen {
     appearance: none;
@@ -1457,4 +1462,30 @@ NOW PLAYING
     padding-bottom: 12px;
     border: 2px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
+}
+.now-now {
+    position: fixed;
+    display: flex;
+    bottom : 5px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 80vw;
+    padding: 0;
+    margin: 0;
+    .media-status {
+        margin: 0;
+        .slider {
+            width: 80vw;
+            max-width: 750px;
+        }
+    }
+}
+.now-now-now {
+    display: flex;
+    width : 55vw;
+    max-width: 500px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 }
